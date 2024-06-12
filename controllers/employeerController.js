@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const cloudinary = require("cloudinary");
 const sendEmail = require("../utils/sendEmail.js");
 const getDataUri = require("../utils/dataUri.js");
+const { EMPLOYER_AUTH_TOKEN } = require("../constants/cookies.constant");
 const fs = require("fs");
 
 async function deleteUsersWithExpiredOTP() {
@@ -76,7 +77,7 @@ Carrer Hub 🏅
 
   res.status(201).json({
     success: true,
-    message: "OTP sent to your registerd Email ID",
+    message: "OTP sent to your registered Email ID",
   });
 });
 
@@ -117,7 +118,7 @@ Carrer Hub 🏅
 
   await sendEmail(user.email, "Welcome To Carrer Hub", emailMessage);
 
-  sendToken(user, 200, res, "Account Verified");
+  sendToken(user, 200, res, "Account Verified", EMPLOYER_AUTH_TOKEN);
 });
 
 //login user
@@ -142,12 +143,12 @@ exports.loginEmployeer = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
-  sendToken(user, 200, res);
+  sendToken(user, 200, res, "Logged in Successfully!", EMPLOYER_AUTH_TOKEN);
 });
 
 // Logout User
 exports.logout = catchAsyncErrors(async (req, res, next) => {
-  res.cookie("token", "", {
+  res.cookie(EMPLOYER_AUTH_TOKEN, "", {
     expires: new Date(0), // Set the expiration date to a past date to immediately expire the cookie
     httpOnly: true,
     secure: "true", // Set to true in production, false in development
@@ -292,8 +293,7 @@ exports.EnterEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
-//get employer proofile
+//get employer profile
 exports.getEmployerDetails = catchAsyncErrors(async (req, res, next) => {
   const user = await Employeer.findById(req.user.id);
 
@@ -303,13 +303,12 @@ exports.getEmployerDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 //update user details
 exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
   const { full_name, email, mobilenumber } = req.body;
 
   const file = req.file; // Assuming you are using multer or similar middleware for file uploads
-  
+
   const user = await Employeer.findById(req.user._id);
 
   if (full_name) user.full_name = full_name;
@@ -346,7 +345,6 @@ exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
     message: "Profile is updated successfully ",
   });
 });
-
 
 // update Employeer password
 exports.updatePasswordEmployeer = catchAsyncErrors(async (req, res, next) => {

@@ -7,6 +7,7 @@ const cloudinary = require("cloudinary");
 const sendEmail = require("../utils/sendEmail.js");
 const getDataUri = require("../utils/dataUri.js");
 const fs = require("fs");
+const { EMPLOYEE_AUTH_TOKEN } = require("../constants/cookies.constant");
 
 async function deleteUsersWithExpiredOTP() {
   try {
@@ -76,7 +77,7 @@ Carrer Hub 🏅
 
   res.status(201).json({
     success: true,
-    message: "OTP sent to your registerd Email ID",
+    message: "OTP sent to your registered Email ID",
   });
 });
 
@@ -117,7 +118,7 @@ Carrer Hub 🏅
 
   await sendEmail(user.email, "Welcome To Carrer Hub", emailMessage);
 
-  sendToken(user, 200, res, "Account Verified");
+  sendToken(user, 200, res, "Account Verified", EMPLOYEE_AUTH_TOKEN);
 });
 
 //login user
@@ -142,12 +143,12 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
-  sendToken(user, 200, res);
+  sendToken(user, 200, res, "Logged in Successfully", EMPLOYEE_AUTH_TOKEN);
 });
 
 // Logout User
 exports.logout = catchAsyncErrors(async (req, res, next) => {
-  res.cookie("token", "", {
+  res.cookie(EMPLOYEE_AUTH_TOKEN, "", {
     expires: new Date(0), // Set the expiration date to a past date to immediately expire the cookie
     httpOnly: true,
     secure: "true", // Set to true in production, false in development
