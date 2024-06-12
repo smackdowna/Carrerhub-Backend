@@ -59,7 +59,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    message: `You have Successfully Created ${employmentType} Oppertunity`,
+    message: `You have Successfully Created ${employmentType} Opportunity`,
   });
 });
 
@@ -204,14 +204,15 @@ exports.getAllEmployeerJob = catchAsyncErrors(async (req, res, next) => {
 
 //Employee Apply for JOB
 exports.ApplyJob = catchAsyncErrors(async (req, res, next) => {
-  const jobs = await Jobs.findById(req.params.id).populate('postedBy','name email');
+  const jobs = await Jobs.findById(req.params.id).populate(
+    "postedBy",
+    "name email"
+  );
 
   const employer = jobs.postedBy.email;
 
   const userId = req.user.id;
   const user = req.user;
-
-
 
   if (!jobs) {
     return next(new ErrorHandler("Jobs Doesn't exist with this ID", 404));
@@ -246,14 +247,17 @@ Best regards,
 Carrer Hub 🏅
     `;
 
-  await sendEmail(user.email, "Application Successfully Received", emailMessage);
-
+  await sendEmail(
+    user.email,
+    "Application Successfully Received",
+    emailMessage
+  );
 
   const emailMessage2 = `Dear ${user.full_name},
 
 Thank you for choosing Carrer Hub! 🏆
 
-You Have Recevied a New Application  for ${jobs.title} for ${jobs.employmentType} Position
+You Have Received a New Application  for ${jobs.title} for ${jobs.employmentType} Position
   
 Thank you for your trust in Carrer Hub.
 
@@ -264,16 +268,13 @@ Carrer Hub 🏅
 
   await sendEmail(employer, "New Application Received", emailMessage2);
 
-
-  
-
   res.status(200).json({
     success: true,
     message: "Successfully Applied",
   });
 });
 
-//get all employe job
+//get all employee job
 exports.getAllEmployeeJob = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
   const jobsCount = await Jobs.countDocuments({ applicants: req.user.id });
