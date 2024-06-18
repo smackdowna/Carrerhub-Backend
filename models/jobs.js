@@ -29,6 +29,10 @@ const jobSchema = new mongoose.Schema({
     enum: ["Remote", "Onsite", "Hybrid"],
     required: true,
   },
+  location: {
+    type: String,
+    required: true,
+  },
   employmentType: {
     type: String,
     enum: ["Full-Time", "Part-Time", "Contract", "Internship"],
@@ -45,7 +49,7 @@ const jobSchema = new mongoose.Schema({
   companyDetails: {
     companyName: {
       type: String,
-      required: true,
+      required: [true, "Please Enter job location !"],
     },
     industryType: {
       type: String,
@@ -74,6 +78,17 @@ const jobSchema = new mongoose.Schema({
     enum: ["Open", "Closed"],
     default: "Open",
   },
+  extraBenefits: {
+    type: String,
+    required: true,
+  },
+  experience: {
+    type: String,
+    required: [
+      true,
+      "Please Enter your experience which are you looking for !",
+    ],
+  },
   applicants: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -81,5 +96,6 @@ const jobSchema = new mongoose.Schema({
     },
   ], // Array of applicant IDs
 });
+jobSchema.index({ title: "text", description: "text" });
 
 module.exports = mongoose.model("Jobs", jobSchema);

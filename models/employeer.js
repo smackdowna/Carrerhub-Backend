@@ -8,7 +8,7 @@ const employeerSchema = new mongoose.Schema({
   full_name: {
     type: String,
     required: [true, "Please Enter Your full Name"],
-    maxLength: [50, "Name cannot exceed 50 charcters"],
+    maxLength: [50, "Name cannot exceed 50 characters"],
   },
   email: {
     type: String,

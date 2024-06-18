@@ -47,7 +47,6 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 //for employeer
 exports.isAuthenticatedEmployeer = catchAsyncErrors(async (req, res, next) => {
   const token = req.cookies;
-  console.log(token);
 
   if (!token[EMPLOYER_AUTH_TOKEN]) {
     return next(new ErrorHandler("Please Login", 401));
