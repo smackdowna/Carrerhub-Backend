@@ -18,6 +18,9 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     employmentDuration,
     salary,
     applicationDeadline,
+    extraBenefits,
+    experience,
+    location,
   } = req.body;
 
   const userId = req.user.id;
@@ -33,7 +36,10 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     !employmentType ||
     !employmentDuration ||
     !salary ||
-    !applicationDeadline
+    !applicationDeadline ||
+    !extraBenefits ||
+    !experience ||
+    !location
   ) {
     return next(new ErrorHandler("Please Enter All Fields", 400));
   }
@@ -55,6 +61,9 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     salary,
     postedBy: userId,
     applicationDeadline,
+    extraBenefits,
+    experience,
+    location,
   });
 
   res.status(201).json({
@@ -68,7 +77,14 @@ exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
   const jobsCount = await Jobs.countDocuments();
 
-  const apiFeature = new ApiFeatures(Jobs.find(), req.query).search().filter();
+  const apiFeature = new ApiFeatures(
+    Jobs.find().sort({
+      postedAt: -1,
+    }),
+    req.query
+  )
+    .search()
+    .filter();
 
   let jobs = await apiFeature.query;
 
@@ -141,8 +157,10 @@ exports.updateJob = catchAsyncErrors(async (req, res, next) => {
     salary,
     applicationDeadline,
     status,
+    extraBenefits,
+    experience,
+    location,
   } = req.body;
-
   const jobs = await Jobs.findOne({
     _id: req.params.id,
     postedBy: req.user.id,
@@ -164,12 +182,15 @@ exports.updateJob = catchAsyncErrors(async (req, res, next) => {
   if (salary) jobs.salary = salary;
   if (applicationDeadline) jobs.applicationDeadline = applicationDeadline;
   if (status) jobs.status = status;
+  if (extraBenefits) jobs.extraBenefits = extraBenefits;
+  if (experience) jobs.experience = experience;
+  if (location) jobs.location = location;
 
   await jobs.save();
 
   res.status(200).json({
     success: true,
-    message: "Job Updated successfully",
+    message: `${jobs.title} Job has been updated`,
   });
 });
 
@@ -344,3 +365,42 @@ exports.getSingleEmployee = catchAsyncErrors(async (req, res, next) => {
     emp,
   });
 });
+
+// exports.searchJob = catchAsyncErrors(async (req, res, next) => {
+//   try {
+//     const { query: searchQuery = "", jobType } = req.query;
+
+//     // Construct search criteria
+//     let searchCriteria = {};
+
+//     if (searchQuery) {
+//       searchCriteria.$text = { $search: searchQuery };
+//     }
+
+//     if (jobType) {
+//       searchCriteria.employmentType = jobType;
+//     }
+
+//     // Find jobs matching the criteria
+//     const jobs = await Jobs.find(searchCriteria);
+
+//     // Handle no jobs found
+//     if (jobs.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "No jobs found for the given search query.",
+//       });
+//     }
+
+//     // Send response with found jobs
+//     res.status(200).json({
+//       success: true,
+//       jobs,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return next(
+//       new ErrorHandler("An error occurred while searching for jobs", 500)
+//     );
+//   }
+// });
