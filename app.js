@@ -26,18 +26,16 @@ app.use(
   })
 );
 
-
 //Route imports
 const user = require("./routes/empRoute.js");
 const employeer = require("./routes/employeerRoute.js");
 const job = require("./routes/jobsRoute.js");
-
-
+const admin = require("./routes/adminRoute.js");
 
 app.use("/api/v1", user);
 app.use("/api/v1", employeer);
 app.use("/api/v1", job);
-
+app.use("/api/v1", admin);
 
 module.exports = app;
 

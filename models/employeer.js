@@ -72,6 +72,9 @@ const employeerSchema = new mongoose.Schema({
     url: {
       type: String,
     },
+    thumbnailUrl: {
+      type: String,
+    },
   },
 
   verified: {

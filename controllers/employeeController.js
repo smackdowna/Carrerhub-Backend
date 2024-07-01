@@ -3,11 +3,12 @@ const catchAsyncErrors = require("../middleware/catchAsyncError");
 const Emp = require("../models/employee.js");
 const sendToken = require("../utils/jwtToken");
 const crypto = require("crypto");
-const cloudinary = require("cloudinary");
+// const cloudinary = require("cloudinary");
 const sendEmail = require("../utils/sendEmail.js");
 const getDataUri = require("../utils/dataUri.js");
 const fs = require("fs");
 const { EMPLOYEE_AUTH_TOKEN } = require("../constants/cookies.constant");
+const { uploadImage, deleteImage } = require("../utils/uploadImage.js");
 
 async function deleteUsersWithExpiredOTP() {
   try {
@@ -344,20 +345,31 @@ exports.updateUserDetails = catchAsyncErrors(async (req, res, next) => {
 
   if (file) {
     const fileUri = getDataUri(file);
-    const mycloud = await cloudinary.v2.uploader.upload(fileUri.content, {
-      folder: "avatars",
-      width: 150,
-      crop: "scale",
-    });
+    console.log(fileUri.fileName);
+    // const mycloud = await cloudinary.v2.uploader.upload(fileUri.content, {
+    //   folder: "avatars",
+    //   width: 150,
+    //   crop: "scale",
+    // });
 
-    // Destroy existing avatar if present
+    const mycloud = await uploadImage(
+      fileUri.content,
+      "fileUri.fileName",
+      "avatars"
+    );
+    //Destroy existing avatar if present
     if (user.avatar.public_id) {
-      await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+      //await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+      await deleteImage(user.avatar.public_id);
     }
 
+    // user.avatar = {
+    //   public_id: mycloud.public_id,
+    //   url: mycloud.secure_url,
+    // };
     user.avatar = {
-      public_id: mycloud.public_id,
-      url: mycloud.secure_url,
+      public_id: mycloud.fileId,
+      url: mycloud.url,
     };
   }
 
@@ -400,8 +412,9 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 //upload/replace resume
 exports.uploadUserResume = catchAsyncErrors(async (req, res, next) => {
   const file = req.file; // Assuming you are using multer or similar middleware for file uploads
-
-  const user = await Employeer.findById(req.user._id);
+  console.log(req.user._id);
+  const user = await Emp.findById(req.user._id);
+  console.log(user);
 
   if (!user.resumes) {
     user.resumes = {};
@@ -409,16 +422,26 @@ exports.uploadUserResume = catchAsyncErrors(async (req, res, next) => {
 
   if (file) {
     const fileUri = getDataUri(file);
-    const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
+    //const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
+    const mycloud = await uploadImage(
+      fileUri.content,
+      fileUri.fileName,
+      "resumes"
+    );
 
     // Destroy existing avatar if present
     if (user.resumes.public_id) {
-      await cloudinary.v2.uploader.destroy(user.resumes.public_id);
+      // await cloudinary.v2.uploader.destroy(user.resumes.public_id);
+      await deleteImage(user.resumes.public_id);
     }
 
+    // user.resumes = {
+    //   public_id: mycloud.public_id,
+    //   url: mycloud.secure_url,
+    // };
     user.resumes = {
-      public_id: mycloud.public_id,
-      url: mycloud.secure_url,
+      public_id: mycloud.fileId,
+      url: mycloud.url,
     };
   }
 
