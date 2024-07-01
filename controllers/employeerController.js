@@ -3,12 +3,13 @@ const catchAsyncErrors = require("../middleware/catchAsyncError");
 const Employeer = require("../models/employeer.js");
 const sendToken = require("../utils/jwtToken");
 const crypto = require("crypto");
-const cloudinary = require("cloudinary");
+// const cloudinary = require("cloudinary");
 const sendEmail = require("../utils/sendEmail.js");
 const getDataUri = require("../utils/dataUri.js");
 const { EMPLOYER_AUTH_TOKEN } = require("../constants/cookies.constant");
-const ik = require("../config/image-kit.js");
+const ik = require("../config/imageKit.js");
 const fs = require("fs");
+const { uploadImage, deleteImage } = require("../utils/uploadImage.js");
 
 async function deleteUsersWithExpiredOTP() {
   try {
@@ -328,39 +329,26 @@ exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
     //   crop: "scale",
     // });
 
-    ik.upload(
-      {
-        file: fileUri.content,
-        fileName: fileUri.fileName,
-        folder: "Employeer_Details",
-        useUniqueFileName: true,
-      },
-      async function (error, result) {
-        console.log(result);
-        if (error) {
-          res.status(400).json({
-            success: false,
-            message: "Profile update failed! Please try again later.",
-          });
-        } else {
-          if (user.company_avatar.public_id && user.company_avatar.url) {
-            await ik.deleteFile(user.company_avatar.public_id);
-            await ik.deleteFile(user.company_avatar.thumbnailUrl);
-            //await cloudinary.v2.uploader.destroy(user.company_avatar.public_id);
-          }
-          user.company_avatar = {
-            public_id: result.fileId,
-            url: result.url,
-            thumbnailUrl: result.thumbnailUrl,
-          };
-          await user.save();
-          res.status(200).json({
-            success: true,
-            message: "Profile is updated successfully ",
-          });
-        }
-      }
+    const result = uploadImage(
+      fileUri.content,
+      fileUri.fileName,
+      "company_avatar"
     );
+    if (user.company_avatar.public_id && user.company_avatar.url) {
+      await deleteImage(user.company_avatar.public_id);
+      await deleteImage(user.company_avatar.thumbnailUrl);
+      //await cloudinary.v2.uploader.destroy(user.company_avatar.public_id);
+    }
+    user.company_avatar = {
+      public_id: result.fileId,
+      url: result.url,
+      thumbnailUrl: result.thumbnailUrl,
+    };
+    await user.save();
+    res.status(200).json({
+      success: true,
+      message: "Profile is updated successfully ",
+    });
   }
 });
 
