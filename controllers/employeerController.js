@@ -329,7 +329,7 @@ exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
     //   crop: "scale",
     // });
 
-    const result = uploadImage(
+    const result = await uploadImage(
       fileUri.content,
       fileUri.fileName,
       "company_avatar"
