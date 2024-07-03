@@ -59,6 +59,10 @@ const jobSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    bio: {
+      type: String,
+      required: true,
+    },
   }, //we can get this from the user who created instead of asking each time
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
