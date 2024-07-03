@@ -57,6 +57,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
       industryType: user.companyDetails[0].industryType,
       websiteLink: user.companyDetails[0].websiteLink,
       bio: user.companyDetails[0].bio,
+      logo: user.company_avatar.url,
     },
     employmentDuration,
     salary,
