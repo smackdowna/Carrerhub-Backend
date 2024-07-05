@@ -5,6 +5,7 @@ const Emp = require("../models/employee.js");
 const Employeer = require("../models/employeer.js");
 const Jobs = require("../models/jobs.js");
 const ApiFeatures = require("../utils/apifeatures.js");
+const mongoose = require("mongoose");
 
 //create JOB
 exports.createJob = catchAsyncErrors(async (req, res, next) => {
@@ -307,10 +308,24 @@ Carrer Hub 🏅
 //get all employee job
 exports.getAllEmployeeJob = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
-  const jobsCount = await Jobs.countDocuments({ applicants: req.user.id });
+  const objectId = mongoose.Types.ObjectId(req.user.id);
+
+  const jobsCount = await Jobs.countDocuments({
+    applicants: {
+      $elemMatch: {
+        employee: objectId,
+      },
+    },
+  });
 
   const apiFeature = new ApiFeatures(
-    Jobs.find({ applicants: req.user.id }),
+    Jobs.find({
+      applicants: {
+        $elemMatch: {
+          employee: objectId,
+        },
+      },
+    }),
     req.query,
   )
     .search()
