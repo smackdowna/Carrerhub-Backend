@@ -2,6 +2,7 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncError");
 const sendEmail = require("../utils/sendEmail.js");
 const Emp = require("../models/employee.js");
+const Employeer = require("../models/employeer.js");
 const Jobs = require("../models/jobs.js");
 const ApiFeatures = require("../utils/apifeatures.js");
 
@@ -83,7 +84,7 @@ exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
     Jobs.find().sort({
       postedAt: -1,
     }),
-    req.query
+    req.query,
   )
     .search()
     .filter();
@@ -203,7 +204,7 @@ exports.getAllEmployeerJob = catchAsyncErrors(async (req, res, next) => {
 
   const apiFeature = new ApiFeatures(
     Jobs.find({ postedBy: req.user.id }),
-    req.query
+    req.query,
   )
     .search()
     .filter();
@@ -229,7 +230,7 @@ exports.getAllEmployeerJob = catchAsyncErrors(async (req, res, next) => {
 exports.ApplyJob = catchAsyncErrors(async (req, res, next) => {
   const jobs = await Jobs.findById(req.params.id).populate(
     "postedBy",
-    "name email"
+    "name email",
   );
 
   const employer = jobs.postedBy.email;
@@ -247,12 +248,18 @@ exports.ApplyJob = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Check if the user has already applied
-  if (jobs.applicants.includes(userId)) {
+  if (
+    jobs.applicants.find(
+      (applicant) => applicant.employee.toString() === userId,
+    )
+  ) {
     return next(new ErrorHandler("You have already applied for the job", 404));
   }
 
   // Add the user's ID to the applicants array
-  jobs.applicants.push(userId);
+  jobs.applicants.push({
+    employee: userId,
+  });
 
   // Save the job document
   await jobs.save();
@@ -262,7 +269,7 @@ exports.ApplyJob = catchAsyncErrors(async (req, res, next) => {
 Thank you for choosing Carrer Hub! 🏆
 
 You Have Successfully Applied for ${jobs.title} for ${jobs.employmentType} Position
-  
+
 Thank you for your trust in Carrer Hub.
 
 Best regards,
@@ -273,7 +280,7 @@ Carrer Hub 🏅
   await sendEmail(
     user.email,
     "Application Successfully Received",
-    emailMessage
+    emailMessage,
   );
 
   const emailMessage2 = `Dear ${user.full_name},
@@ -281,7 +288,7 @@ Carrer Hub 🏅
 Thank you for choosing Carrer Hub! 🏆
 
 You Have Received a New Application  for ${jobs.title} for ${jobs.employmentType} Position
-  
+
 Thank you for your trust in Carrer Hub.
 
 Best regards,
@@ -304,7 +311,7 @@ exports.getAllEmployeeJob = catchAsyncErrors(async (req, res, next) => {
 
   const apiFeature = new ApiFeatures(
     Jobs.find({ applicants: req.user.id }),
-    req.query
+    req.query,
   )
     .search()
     .filter();
@@ -336,13 +343,17 @@ exports.withdrawApplication = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Check if the user has already applied
-  if (!jobs.applicants.includes(userId)) {
-    return next(new ErrorHandler("You have Not applied for this job", 404));
+  if (
+    !jobs.applicants.find(
+      (applicant) => applicant.employee.toString() === userId,
+    )
+  ) {
+    return next(new ErrorHandler("You have not  applied for the job", 404));
   }
 
   // Remove the user's ID from the applicants array
   jobs.applicants = jobs.applicants.filter(
-    (applicantId) => applicantId.toString() !== userId
+    (applicant) => applicant.employee.toString() !== userId,
   );
 
   // Save the updated job document
@@ -365,6 +376,53 @@ exports.getSingleEmployee = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     emp,
+  });
+});
+
+exports.manageAppliedJobs = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user.id;
+  const { jobId, applicantId, status } = req.body;
+  const job = await Jobs.findById(jobId);
+  if (!job.postedBy.toString() === userId) {
+    return next(new ErrorHandler("You have not created this job!", 404));
+  }
+  let applicationStatus = job.applicants.find(
+    (applicant) => applicant.employee.toString() === applicantId,
+  );
+  if (!applicationStatus) {
+    return next(new ErrorHandler("User has not applied for this job!", 404));
+  }
+  applicationStatus.status = status;
+  job.save();
+
+  res.status(200).json({
+    success: true,
+    message: `Job status has been changed to ${status}!`,
+  });
+});
+
+exports.jobIsViewed = catchAsyncErrors(async (req, res, next) => {
+  const { jobId, applicantId } = req.body;
+  const userId = req.user.id;
+  const job = await Jobs.findById(jobId);
+  if (!job.postedBy.toString() === userId) {
+    return next(new ErrorHandler("You have not created this job!", 404));
+  }
+
+  const isApplied = job.applicants.find(
+    (applicant) => applicant.employee.toString() === applicantId,
+  );
+
+  if (!isApplied) {
+    return next(
+      new ErrorHandler("This user with has not applied for this job!", 404),
+    );
+  }
+  isApplied.isViewed = true;
+  await job.save();
+  res.status(200).json({
+    success: true,
+    message: "Jobs has been viwed by Employee!",
   });
 });
 
