@@ -1,5 +1,24 @@
 const mongoose = require("mongoose");
 
+const ApplicantSchema = new mongoose.Schema({
+  employee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
+  },
+  appliedDate: {
+    type: Date,
+    default: Date.now,
+  },
+  status: {
+    type: String,
+    enum: ["APPLIED", "REJECTED", "HIRED", "INTERVIEW"],
+    default: "APPLIED",
+  },
+  isViewed: {
+    type: Boolean,
+    default: false,
+  },
+});
 const jobSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -96,12 +115,7 @@ const jobSchema = new mongoose.Schema({
       "Please Enter your experience which are you looking for !",
     ],
   },
-  applicants: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
-    },
-  ], // Array of applicant IDs
+  applicants: [ApplicantSchema], // Array of applicant IDs
 });
 jobSchema.index({ title: "text", description: "text" });
 

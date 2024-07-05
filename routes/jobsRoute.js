@@ -15,8 +15,8 @@ const {
   getAllEmployeeJob,
   withdrawApplication,
   getSingleEmployee,
-  searchJob,
-  filterJobs,
+  manageAppliedJobs,
+  jobIsViewed,
 } = require("../controllers/jobsController");
 
 const router = express.Router();
@@ -43,5 +43,6 @@ router.route("/employee/job").get(isAuthenticatedUser, getAllEmployeeJob);
 
 router.route("/withdraw/job/:id").put(isAuthenticatedUser, withdrawApplication);
 // router.route("/jobs/search").get(searchJob);
-
+router.route("/jobs/application").put(isAuthenticatedEmployeer, jobIsViewed);
+router.route("/jobs/manage").put(isAuthenticatedEmployeer, manageAppliedJobs);
 module.exports = router;
