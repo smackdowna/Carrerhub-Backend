@@ -130,6 +130,8 @@ employeerSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
-employeerSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 });
+employeerSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 }, {
+  full_name: "text"
+});
 
 module.exports = mongoose.model("Employeer", employeerSchema);
