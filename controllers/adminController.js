@@ -62,7 +62,13 @@ exports.logoutAdmin = catchAsyncErrors(async (req, res, next) => {
     message: "Admin Logged Out Successfully",
   });
 });
-
+exports.adminProfile = catchAsyncErrors(async (req, res, next) => {
+  const admin = await Admin.findById(req.admin.id);
+  res.status(200).json({
+    success: true,
+    admin,
+  });
+});
 exports.getAllEmployers = catchAsyncErrors(async (req, res, next) => {
   const resultsPerPage = 15;
   const employersCount = await Employeer.countDocuments();
@@ -92,6 +98,18 @@ exports.getSingleEmployer = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+exports.deleteEmployer = catchAsyncErrors(async (req, res, next) => {
+  const employer = await Employeer.findById(req.params.id);
+  if (!employer) {
+    return next(new ErrorHandler("Employer doesn't exist with this ID", 404));
+  }
+  await employer.remove();
+  res.status(200).json({
+    success: true,
+    message: "Employer deleted successfully",
+    data: employer
+  });
+});
 exports.getAllEmployees = catchAsyncErrors(async (req, res, next) => {
   const resultsPerPage = 15;
   const employeeCount = await Employee.countDocuments();
@@ -118,3 +136,17 @@ exports.getSingleEmployee = catchAsyncErrors(async (req, res, next) => {
     employee,
   });
 });
+
+exports.deleteEmployee = catchAsyncErrors(async (req, res, next) => {
+  const employee = await Employee.findById(req.params.id);
+  if (!employee) {
+    return next(new ErrorHandler("Employee doesn't exist with this ID", 404));
+  }
+  await employee.remove();
+  res.status(200).json({
+    success: true,
+    message: "Employee deleted successfully",
+    data: employee
+  });
+});
+

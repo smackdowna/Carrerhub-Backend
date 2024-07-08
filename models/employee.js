@@ -161,6 +161,5 @@ empSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
-empSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 });
-
+empSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 }, { full_name: "text" });
 module.exports = mongoose.model("Employee", empSchema);
