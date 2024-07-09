@@ -10,6 +10,7 @@ const {
   adminProfile,
   deleteEmployee,
   deleteEmployer,
+  counts
 } = require("../controllers/adminController");
 const { isAuthenticatedAdmin } = require("../middleware/auth");
 const router = express.Router();
@@ -38,5 +39,6 @@ router
   .route("/admin/employee/:id")
   .get(isAuthenticatedAdmin, getSingleEmployee)
   .delete(isAuthenticatedAdmin, deleteEmployee);
+router.route("/admin/counts").get(isAuthenticatedAdmin, counts);
 
 module.exports = router;

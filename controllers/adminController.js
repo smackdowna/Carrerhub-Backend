@@ -6,6 +6,7 @@ const Employee = require("../models/employee.js");
 const { ADMIN_AUTH_TOKEN } = require("../constants/cookies.constant");
 const sendToken = require("../utils/jwtToken");
 const ApiFeatures = require("../utils/apifeatures.js");
+const Jobs = require("../models/jobs.js");
 
 exports.registerAdmin = catchAsyncErrors(async (req, res, next) => {
   const { full_name, email, password } = req.body;
@@ -150,3 +151,21 @@ exports.deleteEmployee = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+exports.counts = catchAsyncErrors(async (req, res, next) => {
+  const employersCount = await Employeer.countDocuments();
+  const employeesCount = await Employee.countDocuments();
+  const totalJobs = await Jobs.find().populate("applicants");
+  let hiredApplicantsCount = 0;
+  totalJobs.forEach(job => {
+    hiredApplicantsCount += job.applicants.filter(applicant => applicant.status === "HIRED").length;
+  });
+
+  console.log(totalJobs);
+  res.status(200).json({
+    success: true,
+    jobsCount: totalJobs.length,
+    employersCount,
+    employeesCount,
+    hiredApplicantsCount
+  });
+});

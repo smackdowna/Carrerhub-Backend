@@ -437,7 +437,7 @@ exports.jobIsViewed = catchAsyncErrors(async (req, res, next) => {
   await job.save();
   res.status(200).json({
     success: true,
-    message: "Jobs has been viwed by Employee!",
+    message: "Jobs has been viwed by Employer!",
   });
 });
 
