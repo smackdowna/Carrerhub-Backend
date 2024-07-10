@@ -13,7 +13,7 @@ const {
   updateEmployeerDetails,
 } = require("../controllers/employeerController");
 const { updatePassword } = require("../controllers/employeeController");
-
+const { getSingleEmployee } = require("../controllers/jobsController");
 const router = express.Router();
 
 //register
@@ -47,8 +47,10 @@ router
 
 
 //change password
-router.route("/employeer/password/update").put(isAuthenticatedEmployeer, updatePassword); 
- 
-  
+router.route("/employeer/password/update").put(isAuthenticatedEmployeer, updatePassword);
+router
+  .route("/employeer/employee/:id")
+  .get(isAuthenticatedEmployeer, getSingleEmployee)
+
 
 module.exports = router;
