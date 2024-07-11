@@ -10,6 +10,7 @@ const {
   adminProfile,
   deleteEmployee,
   deleteEmployer,
+  counts
 } = require("../controllers/adminController");
 const { isAuthenticatedAdmin } = require("../middleware/auth");
 const { deletejob } = require("../controllers/jobsController");
@@ -39,7 +40,11 @@ router
   .route("/admin/employee/:id")
   .get(isAuthenticatedAdmin, getSingleEmployee)
   .delete(isAuthenticatedAdmin, deleteEmployee);
+
 //admin delete job api
 router.route("/admin/job/:id").delete(isAuthenticatedAdmin, deletejob);
+
+router.route("/admin/counts").get(isAuthenticatedAdmin, counts);
+
 
 module.exports = router;
