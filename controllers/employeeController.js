@@ -149,12 +149,13 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 
 // Logout User
 exports.logout = catchAsyncErrors(async (req, res, next) => {
-  res.cookie(EMPLOYEE_AUTH_TOKEN, "", {
-    expires: new Date(0), // Set the expiration date to a past date to immediately expire the cookie
-    httpOnly: true,
-    secure: "true", // Set to true in production, false in development
-    sameSite: "None", // Ensure SameSite is set to None for cross-site cookies
-  });
+  // res.cookie(EMPLOYEE_AUTH_TOKEN, "", {
+  //   expires: new Date(0), // Set the expiration date to a past date to immediately expire the cookie
+  //   httpOnly: true,
+  //   secure: "true", // Set to true in production, false in development
+  //   sameSite: "None", // Ensure SameSite is set to None for cross-site cookies
+  // });
+  res.clearCookie(EMPLOYEE_AUTH_TOKEN);
 
   res.status(200).json({
     success: true,
