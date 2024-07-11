@@ -12,6 +12,7 @@ const {
   deleteEmployer,
 } = require("../controllers/adminController");
 const { isAuthenticatedAdmin } = require("../middleware/auth");
+const { deletejob } = require("../controllers/jobsController");
 const router = express.Router();
 
 //admin register api
@@ -38,5 +39,7 @@ router
   .route("/admin/employee/:id")
   .get(isAuthenticatedAdmin, getSingleEmployee)
   .delete(isAuthenticatedAdmin, deleteEmployee);
+//admin delete job api
+router.route("/admin/job/:id").delete(isAuthenticatedAdmin, deletejob);
 
 module.exports = router;

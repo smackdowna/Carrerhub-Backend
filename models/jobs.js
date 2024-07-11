@@ -58,13 +58,13 @@ const jobSchema = new mongoose.Schema({
     required: true,
   },
   employmentDuration: {
-    type: String,
+    type: Number,
     required: true,
   }, // Duration in months, optional
   salary: {
-    type: String,
-    required: true,
-  }, // Optional
+    type: Number,
+    required: true,//salary range per month
+  }, // Optional 
   companyDetails: {
     companyName: {
       type: String,
