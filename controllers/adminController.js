@@ -169,3 +169,20 @@ exports.counts = catchAsyncErrors(async (req, res, next) => {
     hiredApplicantsCount
   });
 });
+exports.deletejob = catchAsyncErrors(async (req, res, next) => {
+  const job = await Jobs.findOne({
+    _id: req.params.id,
+  });
+
+  if (!job) {
+    return next(new ErrorHandler("Not found or you are not authorized", 404));
+  }
+
+
+  await job.remove();
+  res.status(200).json({
+    success: true,
+    message: "Deleted Successfully",
+  });
+
+});
