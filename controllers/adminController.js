@@ -7,6 +7,7 @@ const { ADMIN_AUTH_TOKEN } = require("../constants/cookies.constant");
 const sendToken = require("../utils/jwtToken");
 const ApiFeatures = require("../utils/apifeatures.js");
 const Jobs = require("../models/jobs.js");
+const Search = require("../utils/search.js");
 
 exports.registerAdmin = catchAsyncErrors(async (req, res, next) => {
   const { full_name, email, password } = req.body;
@@ -73,9 +74,8 @@ exports.adminProfile = catchAsyncErrors(async (req, res, next) => {
 exports.getAllEmployers = catchAsyncErrors(async (req, res, next) => {
   const resultsPerPage = 15;
   const employersCount = await Employeer.countDocuments();
-  const apiFeatures = new ApiFeatures(Employeer.find(), req.query)
+  const apiFeatures = new Search(Employeer.find(), req.query)
     .search()
-    .filter()
     .pagination(resultsPerPage);
   const employers = await apiFeatures.query;
   const filteredEmployersCount = employers.length;
@@ -114,9 +114,8 @@ exports.deleteEmployer = catchAsyncErrors(async (req, res, next) => {
 exports.getAllEmployees = catchAsyncErrors(async (req, res, next) => {
   const resultsPerPage = 15;
   const employeeCount = await Employee.countDocuments();
-  const apiFeatures = new ApiFeatures(Employee.find(), req.query)
+  const apiFeatures = new Search(Employee.find(), req.query)
     .search()
-    .filter()
     .pagination(resultsPerPage);
   const employees = await apiFeatures.query;
   const filteredEmployersCount = employees.length;
