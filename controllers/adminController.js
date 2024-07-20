@@ -194,17 +194,8 @@ exports.contact = catchAsyncErrors(async (req, res, next) => {
   }
 
   const text = `
-    <div style="font-family: Arial, sans-serif; line-height: 1;">
-      <h2 style="color: green;">New Contact Message</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Mobile Number:</strong> ${number}</p>
-      <p><strong>City:</strong> ${city}</p>
-      <p><strong>Message:</strong></p>
-      <p style="background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
-        ${message}
-      </p>
-    </div>
+    ${name} from ${city} with phone number ${number} has sent you a message:
+    ${message} And can be reached at ${email}!
   `;
 
   try {
