@@ -1,3 +1,4 @@
+const sendEmail = require("../utils/sendEmail");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncError");
 const Admin = require("../models/admin");
@@ -184,4 +185,43 @@ exports.deletejob = catchAsyncErrors(async (req, res, next) => {
     message: "Deleted Successfully",
   });
 
+});
+
+exports.contact = catchAsyncErrors(async (req, res, next) => {
+  const { name, email, number, city, message } = req.body;
+  if (!name || !email || !number || !city || !message) {
+    return next(new ErrorHandler("Please enter all fields", 400));
+  }
+
+  const text = `
+    <div style="font-family: Arial, sans-serif; line-height: 1;">
+      <h2 style="color: green;">New Contact Message</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Mobile Number:</strong> ${number}</p>
+      <p><strong>City:</strong> ${city}</p>
+      <p><strong>Message:</strong></p>
+      <p style="background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+        ${message}
+      </p>
+    </div>
+  `;
+
+  try {
+    await sendEmail(
+      process.env.ADMIN_EMAIL,
+      "You have received a new contact message",
+      text
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Contact message sent successfully!`,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Something went wrong while sending the contact message!`,
+    });
+  }
 });
