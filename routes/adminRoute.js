@@ -12,6 +12,7 @@ const {
   deleteEmployer,
   counts,
   deletejob,
+  contact
 } = require("../controllers/adminController");
 const { isAuthenticatedAdmin } = require("../middleware/auth");
 const router = express.Router();
@@ -45,6 +46,6 @@ router
 router.route("/admin/job/:id").delete(isAuthenticatedAdmin, deletejob);
 
 router.route("/admin/counts").get(isAuthenticatedAdmin, counts);
-
+router.route("/admin/contact").post(contact);
 
 module.exports = router;
