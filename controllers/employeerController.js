@@ -305,57 +305,58 @@ exports.getEmployerDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//update user details
 exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
-  const { full_name, email, mobilenumber } = req.body;
+  try {
+    const { full_name, email, mobilenumber } = req.body;
+    const file = req.file;
+    const user = await Employeer.findById(req.user._id);
 
-  const file = req.file; // Assuming you are using multer or similar middleware for file uploads
-
-  const user = await Employeer.findById(req.user._id);
-
-  if (full_name) user.full_name = full_name;
-  if (email) user.email = email;
-  if (mobilenumber) user.mobilenumber = mobilenumber;
-
-  if (!user.company_avatar) {
-    user.company_avatar = {};
-  }
-
-  if (file) {
-    const fileUri = getDataUri(file);
-    // const mycloud = await cloudinary.v2.uploader.upload(fileUri.content, {
-    //   folder: "company_avatar",
-    //   width: 150,
-    //   crop: "scale",
-    // });
-
-    const result = await uploadImage(
-      fileUri.content,
-      fileUri.fileName,
-      "company_avatar"
-    );
-    if (user.company_avatar.public_id && user.company_avatar.url) {
-      await deleteImage(user.company_avatar.public_id);
-      await deleteImage(user.company_avatar.thumbnailUrl);
-      //await cloudinary.v2.uploader.destroy(user.company_avatar.public_id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
-    user.company_avatar = {
-      public_id: result.fileId,
-      url: result.url,
-      thumbnailUrl: result.thumbnailUrl,
-    };
+
+    if (full_name) user.full_name = full_name;
+    if (email) user.email = email;
+    if (mobilenumber) user.mobilenumber = mobilenumber;
+
+    if (!user.company_avatar) {
+      user.company_avatar = {};
+    }
+
+    if (file) {
+      const fileUri = getDataUri(file);
+      const result = await uploadImage(fileUri.content, fileUri.fileName, "company_avatar");
+      console.log(result)
+      if (user.company_avatar.public_id && user.company_avatar.url) {
+        await deleteImage(user.company_avatar.public_id);
+      }
+      user.company_avatar = {
+        public_id: result.fileId,
+        url: result.url,
+        thumbnailUrl: result.thumbnailUrl,
+      };
+    }
     await user.save();
     res.status(200).json({
       success: true,
-      message: "Profile is updated successfully ",
+      message: "Profile updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong!",
+      error: error
     });
   }
 });
-
 // update Employeer password
 exports.updatePasswordEmployeer = catchAsyncErrors(async (req, res, next) => {
   if (!req.body.oldPassword) {
-    return next(new ErrorHandler("please enter your OLd password", 400));
+    return next(new ErrorHandler("Please enter your old password", 400));
   }
 
   const user = await Employeer.findById(req.user.id).select("+password");
