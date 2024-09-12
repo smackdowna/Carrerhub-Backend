@@ -265,6 +265,61 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 //Enter Education,Address and other details
+// exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
+//   const {
+//     address,
+//     education,
+//     experience,
+//     projects,
+//     certifications,
+//     skills,
+//     socialLinks,
+//     interests, // Corrected spelling from 'intrests' to 'interests'
+//   } = req.body;
+
+//   // Validate that each field is an array
+//   // if (
+//   //   !Array.isArray(address) ||
+//   //   !Array.isArray(education) ||
+//   //   !Array.isArray(experience) ||
+//   //   !Array.isArray(projects) ||
+//   //   !Array.isArray(skills)
+//   // ) {
+//   //   return next(new ErrorHandler("Please Enter All Fields", 400));
+//   // }
+
+//   // Assuming req.user contains the authenticated user info
+//   const userId = req.user.id;
+
+//   // Update user details in the database
+//   const updatedUser = await Emp.findByIdAndUpdate(
+//     userId,
+//     {
+//       address,
+//       education,
+//       experience,
+//       projects,
+//       certifications,
+//       skills,
+//       socialLinks,
+//       interests,
+//     },
+//     { new: true, runValidators: true }
+//   );
+
+//   if (!updatedUser) {
+//     return next(new ErrorHandler("User not found", 404));
+//   }
+
+//   res.status(201).json({
+//     success: true,
+//     message: "Details Updated Successfully",
+//   });
+// });
+
+
+
+
 exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
   const {
     address,
@@ -277,33 +332,26 @@ exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
     interests, // Corrected spelling from 'intrests' to 'interests'
   } = req.body;
 
-  // Validate that each field is an array
-  if (
-    !Array.isArray(address) ||
-    !Array.isArray(education) ||
-    !Array.isArray(experience) ||
-    !Array.isArray(projects) ||
-    !Array.isArray(skills)
-  ) {
-    return next(new ErrorHandler("Please Enter All Fields", 400));
-  }
-
   // Assuming req.user contains the authenticated user info
   const userId = req.user.id;
 
-  // Update user details in the database
+  // Create an empty object to hold the fields that the user provided
+  const updateFields = {};
+
+  // Dynamically add fields to updateFields if they are provided in the request
+  if (address) updateFields.address = address;
+  if (education) updateFields.education = education;
+  if (experience) updateFields.experience = experience;
+  if (projects) updateFields.projects = projects;
+  if (certifications) updateFields.certifications = certifications;
+  if (skills) updateFields.skills = skills;
+  if (socialLinks) updateFields.socialLinks = socialLinks;
+  if (interests) updateFields.interests = interests;
+
+  // Update user details in the database only with the provided fields
   const updatedUser = await Emp.findByIdAndUpdate(
     userId,
-    {
-      address,
-      education,
-      experience,
-      projects,
-      certifications,
-      skills,
-      socialLinks,
-      interests,
-    },
+    updateFields,
     { new: true, runValidators: true }
   );
 

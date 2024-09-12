@@ -265,23 +265,52 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 //Enter company Details
+// exports.EnterEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
+//   const { address, companyDetails } = req.body;
+
+//   if (!Array.isArray(address) || !Array.isArray(companyDetails)) {
+//     return next(new ErrorHandler("Please Enter All Fields", 400));
+//   }
+
+//   // Assuming req.user contains the authenticated user info
+//   const userId = req.user.id;
+
+//   // Update user details in the database
+//   const updatedUser = await Employeer.findByIdAndUpdate(
+//     userId,
+//     {
+//       address,
+//       companyDetails,
+//     },
+//     { new: true, runValidators: true }
+//   );
+
+//   if (!updatedUser) {
+//     return next(new ErrorHandler("User not found", 404));
+//   }
+
+//   res.status(201).json({
+//     success: true,
+//     message: "Details Updated Successfully",
+//   });
+// });
 exports.EnterEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
   const { address, companyDetails } = req.body;
-
-  if (!Array.isArray(address) || !Array.isArray(companyDetails)) {
-    return next(new ErrorHandler("Please Enter All Fields", 400));
-  }
 
   // Assuming req.user contains the authenticated user info
   const userId = req.user.id;
 
-  // Update user details in the database
+  // Create an empty object to hold the fields that the user provided
+  const updateFields = {};
+
+  // Dynamically add fields to updateFields if they are provided in the request
+  if (address) updateFields.address = address;
+  if (companyDetails) updateFields.companyDetails = companyDetails;
+
+  // Update user details in the database only with the provided fields
   const updatedUser = await Employeer.findByIdAndUpdate(
     userId,
-    {
-      address,
-      companyDetails,
-    },
+    updateFields,
     { new: true, runValidators: true }
   );
 
@@ -294,6 +323,7 @@ exports.EnterEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
     message: "Details Updated Successfully",
   });
 });
+
 
 //get employer profile
 exports.getEmployerDetails = catchAsyncErrors(async (req, res, next) => {
