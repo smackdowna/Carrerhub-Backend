@@ -1,6 +1,6 @@
 const imageKit = require("../config/imageKit.js");
 
-const uploadImage = (file, fileName, folder) => {
+const uploadFile = (file, fileName, folder) => {
   return new Promise((resolve, reject) => {
     imageKit.upload(
       {
@@ -19,7 +19,7 @@ const uploadImage = (file, fileName, folder) => {
   });
 };
 
-const deleteImage = (fileId) => {
+const deleteFile = (fileId) => {
   return new Promise((resolve, reject) => {
     imageKit.deleteFile(fileId, (err, result) => {
       if (err) {
@@ -32,6 +32,6 @@ const deleteImage = (fileId) => {
 };
 
 module.exports = {
-  uploadImage,
-  deleteImage,
+  uploadFile,
+  deleteFile,
 };
