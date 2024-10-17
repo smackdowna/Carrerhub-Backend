@@ -8,7 +8,7 @@ const sendEmail = require("../utils/sendEmail.js");
 const getDataUri = require("../utils/dataUri.js");
 const fs = require("fs");
 const { EMPLOYEE_AUTH_TOKEN } = require("../constants/cookies.constant");
-const { uploadImage, deleteImage } = require("../utils/uploadImage.js");
+const { uploadFile, deleteFile } = require("../utils/uploadFile.js");
 
 async function deleteUsersWithExpiredOTP() {
   try {
@@ -401,7 +401,7 @@ exports.updateUserDetails = catchAsyncErrors(async (req, res, next) => {
     //   crop: "scale",
     // });
 
-    const mycloud = await uploadImage(
+    const mycloud = await uploadFile(
       fileUri.content,
       "fileUri.fileName",
       "avatars"
@@ -409,7 +409,7 @@ exports.updateUserDetails = catchAsyncErrors(async (req, res, next) => {
     //Destroy existing avatar if present
     if (user.avatar.public_id) {
       //await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-      await deleteImage(user.avatar.public_id);
+      await deleteFile(user.avatar.public_id);
     }
 
     // user.avatar = {
@@ -472,7 +472,7 @@ exports.uploadUserResume = catchAsyncErrors(async (req, res, next) => {
   if (file) {
     const fileUri = getDataUri(file);
     //const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
-    const mycloud = await uploadImage(
+    const mycloud = await uploadFile(
       fileUri.content,
       fileUri.fileName,
       "resumes"
@@ -481,7 +481,7 @@ exports.uploadUserResume = catchAsyncErrors(async (req, res, next) => {
     // Destroy existing avatar if present
     if (user.resumes.public_id) {
       // await cloudinary.v2.uploader.destroy(user.resumes.public_id);
-      await deleteImage(user.resumes.public_id);
+      await deleteFile(user.resumes.public_id);
     }
 
     // user.resumes = {

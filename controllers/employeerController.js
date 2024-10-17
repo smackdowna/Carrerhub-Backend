@@ -9,7 +9,7 @@ const getDataUri = require("../utils/dataUri.js");
 const { EMPLOYER_AUTH_TOKEN } = require("../constants/cookies.constant");
 const ik = require("../config/imageKit.js");
 const fs = require("fs");
-const { uploadImage, deleteImage } = require("../utils/uploadImage.js");
+const { uploadFile, deleteFile } = require("../utils/uploadFile.js");
 
 async function deleteUsersWithExpiredOTP() {
   try {
@@ -358,10 +358,10 @@ exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
 
     if (file) {
       const fileUri = getDataUri(file);
-      const result = await uploadImage(fileUri.content, fileUri.fileName, "company_avatar");
+      const result = await uploadFile(fileUri.content, fileUri.fileName, "company_avatar");
       console.log(result)
       if (user.company_avatar.public_id && user.company_avatar.url) {
-        await deleteImage(user.company_avatar.public_id);
+        await deleteFile(user.company_avatar.public_id);
       }
       user.company_avatar = {
         public_id: result.fileId,
