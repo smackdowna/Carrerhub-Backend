@@ -35,11 +35,17 @@ const user = require("./routes/empRoute.js");
 const employeer = require("./routes/employeerRoute.js");
 const job = require("./routes/jobsRoute.js");
 const admin = require("./routes/adminRoute.js");
+const skills = require("./routes/skillsRoute.js");
+const videos = require("./routes/videoRoute.js");
+const courses = require("./routes/coursesRoute.js");
 
 app.use("/api/v1", user);
 app.use("/api/v1", employeer);
 app.use("/api/v1", job);
 app.use("/api/v1", admin);
+app.use("/api/v1", skills);
+app.use("/api/v1", videos);
+app.use("/api/v1", courses);
 
 module.exports = app;
 
