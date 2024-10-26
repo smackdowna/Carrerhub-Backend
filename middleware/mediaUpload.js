@@ -25,7 +25,7 @@ const validateMediaType = (allowedTypes) => (req, file, cb) => {
 const uploadConfig = multer({
     storage: storage,
     limits: {
-        fileSize: 100 * 1024 * 1024, // 100MB max file size
+        fileSize: 500 * 1024 * 1024,
     }
 });
 
