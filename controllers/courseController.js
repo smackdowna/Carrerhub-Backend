@@ -2,8 +2,9 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncError");
 const ApiFeatures = require("../utils/apifeatures.js");
 const Course = require("../models/courses.js");
-const { uploadFile } = require("../utils/uploadFile.js");
+const { uploadFile, bulkDeleteFiles } = require("../utils/uploadFile.js");
 const getDataUri = require("../utils/dataUri.js");
+const Video = require("../models/videos.js");
 
 // Create Course with Videos
 exports.createCourse = catchAsyncErrors(async (req, res, next) => {
@@ -43,7 +44,7 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
 
         // Populate the videos field for response
         const populatedCourse = await Course.findById(course._id)
-            .populate("videos", "name url createdAt"); // Populate the videos field
+            .populate("videos", "name title url createdAt"); // Populate the videos field
 
         res.status(201).json({
             success: true,
@@ -104,7 +105,7 @@ exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
     const apiFeature = new ApiFeatures(
         Course.find().populate({
             path: 'videos',
-            select: 'name url createdAt'
+            select: 'name url title createdAt'
         }),
         req.query
     )
@@ -128,7 +129,7 @@ exports.getCourseDetails = catchAsyncErrors(async (req, res, next) => {
     const course = await Course.findById(id)
         .populate({
             path: 'videos',
-            select: 'name url createdAt'
+            select: 'name url title createdAt'
         });
 
     if (!course) {
@@ -144,20 +145,47 @@ exports.getCourseDetails = catchAsyncErrors(async (req, res, next) => {
 // Delete Course
 exports.deleteCourse = catchAsyncErrors(async (req, res, next) => {
     const id = req.params.id;
+
     if (!id) {
         return next(new ErrorHandler("Course ID is required", 400));
     }
-    const course = await Course.findById(id);
+
+    const course = await Course.findById(id).populate("videos");
 
     if (!course) {
         return next(new ErrorHandler("Course not found", 404));
     }
+
+    const fileIdsToDelete = [];
     if (course.thumbnail) {
-        await deleteFile(course.thumbnail.fileId);
+        fileIdsToDelete.push(course.thumbnail.fileId);
     }
+
+    const videoIdsToDelete = [];
+    if (course.videos && course.videos.length > 0) {
+        course.videos.forEach(video => {
+            fileIdsToDelete.push(video.fileId);
+            videoIdsToDelete.push(video._id);
+        });
+    }
+    if (fileIdsToDelete.length > 0) {
+        try {
+            await bulkDeleteFiles(fileIdsToDelete);
+        } catch (error) {
+            console.log(error);
+            return next(new ErrorHandler("Failed to delete files", 500));
+        }
+    }
+
+    if (videoIdsToDelete.length > 0) {
+        await Video.deleteMany({ _id: { $in: videoIdsToDelete } });
+    }
+
+
     await course.deleteOne();
 
     res.status(200).json({
+        data: course,
         success: true,
         message: "Course deleted successfully"
     });

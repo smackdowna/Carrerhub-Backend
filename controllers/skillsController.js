@@ -2,8 +2,10 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncError");
 const ApiFeatures = require("../utils/apifeatures.js");
 const Skill = require("../models/skill.js");
-const { uploadFile, deleteFile } = require("../utils/uploadFile.js");
+const { uploadFile, deleteFile, bulkDeleteFiles } = require("../utils/uploadFile.js");
 const getDataUri = require("../utils/dataUri.js");
+const Video = require("../models/videos.js");
+
 
 // Create Skill with Videos
 exports.createSkills = catchAsyncErrors(async (req, res, next) => {
@@ -39,7 +41,7 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
         });
 
         const populatedSkill = await Skill.findById(skill._id)
-            .populate("video", "name url createdAt");
+            .populate("video", "name url createdAt title");
 
         res.status(201).json({
             success: true,
@@ -95,7 +97,7 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
 
     // Populate the updated skill data for the response
     const populatedSkill = await Skill.findById(skill._id)
-        .populate("video", "name url createdAt"); // Populate the video field
+        .populate("video", "name url createdAt title"); // Populate the video field
 
     res.status(200).json({
         success: true,
@@ -107,7 +109,7 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
 // Other controller methods remain the same...
 exports.getAllSkills = catchAsyncErrors(async (req, res, next) => {
     const apiFeature = new ApiFeatures(
-        Skill.find().populate("video", "name url createdAt"), // Changed from videos to video
+        Skill.find().populate("video", "name url title createdAt"), // Changed from videos to video
         req.query
     )
         .search()
@@ -124,7 +126,7 @@ exports.getAllSkills = catchAsyncErrors(async (req, res, next) => {
 
 exports.getSkillDetails = catchAsyncErrors(async (req, res, next) => {
     const skill = await Skill.findById(req.params.id)
-        .populate("video", "name url createdAt"); // Changed from videos to video
+        .populate("video", "name url title createdAt"); // Changed from videos to video
 
     if (!skill) {
         return next(new ErrorHandler("Skill not found", 404));
@@ -138,14 +140,43 @@ exports.getSkillDetails = catchAsyncErrors(async (req, res, next) => {
 
 
 exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
-    const skill = await Skill.findById(req.params.id);
+    const id = req.params.id;
+
+    if (!id) {
+        return next(new ErrorHandler("Skill ID is required", 400));
+    }
+
+    const skill = await Skill.findById(id).populate("video");
 
     if (!skill) {
         return next(new ErrorHandler("Skill not found", 404));
     }
+
+    // Gather file IDs for deletion
+    const fileIdsToDelete = [];
     if (skill.thumbnail) {
-        await deleteFile(skill.thumbnail.fileId);
+        fileIdsToDelete.push(skill.thumbnail.fileId);
     }
+
+    const videoIdsToDelete = [];
+    if (skill.video) { // Assuming there's only one video related to the skill
+        fileIdsToDelete.push(skill.video.fileId);
+        videoIdsToDelete.push(skill.video._id);
+    }
+    console.log(fileIdsToDelete)
+    if (fileIdsToDelete.length > 0) {
+        try {
+            await bulkDeleteFiles(fileIdsToDelete);
+        } catch (error) {
+            console.log(error);
+            return next(new ErrorHandler("Failed to delete files", 500));
+        }
+    }
+
+    if (videoIdsToDelete.length > 0) {
+        await Video.deleteMany({ _id: { $in: videoIdsToDelete } });
+    }
+
     await skill.deleteOne();
 
     res.status(200).json({
