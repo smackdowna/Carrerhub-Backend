@@ -53,7 +53,8 @@ exports.getVideo = catchAsyncErrors(async (req, res, next) => {
     });
 });
 exports.updateVideo = catchAsyncErrors(async (req, res, next) => {
-    const video = await Video.findByIdAndUpdate(req.params.id);
+    const video = await Video.findById(req.params.id);
+    console.log(video);
 
     if (!video) {
         return next(new ErrorHandler("Video not found", 404));
@@ -65,9 +66,11 @@ exports.updateVideo = catchAsyncErrors(async (req, res, next) => {
     if (!videoFile) {
         return next(new ErrorHandler("Please Upload a Video", 400));
     }
-    if (video.fileId) {
+    if (video.fileId && videoFile) {
         await deleteFile(video.fileId);
-    } else {
+
+    }
+    if (videoFile) {
         const videoUri = getDataUri(videoFile);
         const uploadedVideo = await uploadFile(
             videoUri.content,
@@ -81,16 +84,17 @@ exports.updateVideo = catchAsyncErrors(async (req, res, next) => {
         video.fileId = uploadedVideo.fileId;
         video.name = uploadedVideo.name;
         video.url = uploadedVideo.url;
-
-        await video.save();
-
-        res.status(200).json({
-            success: true,
-            video,
-            message: "Video updated successfully"
-        });
-
     }
+
+    await video.save();
+
+    res.status(200).json({
+        success: true,
+        video,
+        message: "Video updated successfully"
+    });
+
+
 })
 
 exports.deleteVideo = catchAsyncErrors(async (req, res, next) => {
