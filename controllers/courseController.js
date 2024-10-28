@@ -2,7 +2,7 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncError");
 const ApiFeatures = require("../utils/apifeatures.js");
 const Course = require("../models/courses.js");
-const { uploadFile, bulkDeleteFiles } = require("../utils/uploadFile.js");
+const { uploadFile, bulkDeleteFiles, deleteFile } = require("../utils/uploadFile.js");
 const getDataUri = require("../utils/dataUri.js");
 const Video = require("../models/videos.js");
 
@@ -58,47 +58,6 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-// Update Course
-exports.updateCourse = catchAsyncErrors(async (req, res, next) => {
-    const id = req.params.id;
-    if (!id) {
-        return next(new ErrorHandler("Course ID is required", 400));
-    }
-    const { name, description, videos } = req.body;
-    const course = await Course.findById(id);
-
-    if (!course) {
-        return next(new ErrorHandler("Course not found", 404));
-    }
-
-    if (name) course.name = name;
-    if (description) course.description = description;
-    if (videos) course.videos = videos;
-
-    const thumbnailFile = req.files?.image?.[0];
-    if (course.thumbnail && thumbnailFile) {
-        // Delete old thumbnail
-        await deleteFile(course.thumbnail.fileId);
-    } else if (thumbnailFile) {
-        const thumbnailUri = getDataUri(thumbnailFile);
-        const thumbnail = await uploadFile(
-            thumbnailUri.content,
-            thumbnailUri.fileName,
-            "course-thumbnails"
-        );
-        course.thumbnail = {
-            fileId: thumbnail.fileId,
-            name: thumbnail.name,
-            url: thumbnail.url
-        };
-    }
-
-    await course.save();
-    res.status(200).json({
-        success: true,
-        course
-    });
-});
 
 // Get All Courses
 exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
@@ -188,5 +147,54 @@ exports.deleteCourse = catchAsyncErrors(async (req, res, next) => {
         data: course,
         success: true,
         message: "Course deleted successfully"
+    });
+});
+exports.updateCourse = catchAsyncErrors(async (req, res, next) => {
+    const id = req.params.id;
+    if (!id) {
+        return next(new ErrorHandler("Course ID is required", 400));
+    }
+
+    const { name, description, videos } = req.body;
+    const course = await Course.findById(id);
+    if (!course) {
+        return next(new ErrorHandler("Course not found", 404));
+    }
+
+
+    if (name) course.name = name;
+    if (description) course.description = description;
+
+    if (videos) {
+        const validExistingVideos = [];
+        for (const videoId of course.videos) {
+            const videoExists = await Video.exists({ _id: videoId });
+            if (videoExists) {
+                validExistingVideos.push(videoId);
+            }
+        }
+
+        course.videos = [...validExistingVideos, ...videos];
+
+    }
+    const thumbnailFile = req.files?.image?.[0];
+    if (course.thumbnail && thumbnailFile) {
+        await deleteFile(course.thumbnail.fileId);
+    }
+
+    if (thumbnailFile) {
+        const thumbnailUri = getDataUri(thumbnailFile);
+        const thumbnail = await uploadFile(thumbnailUri.content, thumbnailUri.fileName, "course-thumbnails");
+        course.thumbnail = {
+            fileId: thumbnail.fileId,
+            name: thumbnail.name,
+            url: thumbnail.url
+        };
+    }
+
+    await course.save();
+    res.status(200).json({
+        success: true,
+        course
     });
 });
