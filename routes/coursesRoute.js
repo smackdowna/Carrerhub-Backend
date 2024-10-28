@@ -5,7 +5,7 @@ const {
     deleteCourse,
     getAllCourses,
     getCourseDetails,
-    updateCourse
+    updateCourse,
 } = require("../controllers/courseController.js");
 const handleMultiMediaUpload = require("../middleware/mediaUpload.js");
 const router = express.Router();
