@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const NodeCache = require("node-cache");
+const morgan = require('morgan')
 
 //config
 dotenv.config({ path: "./config/config.env" });
@@ -25,6 +26,11 @@ app.use(
     methods: ["GET", "POST", "DELETE", "PUT"],
   })
 );
+//logging
+
+app.use(morgan('dev'));
+
+
 
 //Route imports
 const user = require("./routes/empRoute.js");

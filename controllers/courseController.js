@@ -165,7 +165,7 @@ exports.updateCourse = catchAsyncErrors(async (req, res, next) => {
     if (name) course.name = name;
     if (description) course.description = description;
 
-    if (videos) {
+    if (videos || course.videos) {
         const validExistingVideos = [];
         for (const videoId of course.videos) {
             const videoExists = await Video.exists({ _id: videoId });
