@@ -20,7 +20,6 @@ app.use(
       "http://localhost:3000",
       "https://career-hub-frontend.vercel.app",
       "http://localhost:5173",
-      "https://career-hub-pi.vercel.app",
       "https://career-hub-pi.vercel.app"
     ],
     credentials: true,
