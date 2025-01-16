@@ -106,7 +106,7 @@ exports.verify = catchAsyncErrors(async (req, res, next) => {
 
   const emailMessage = `Dear ${user.full_name},
 
-Thank you for choosing Carrer Hub! 🏆
+Thank you for choosing MedHR+! 🏆
 
 You are a Verified User Start Your JOb/Internship search. 
   
@@ -114,10 +114,10 @@ Thank you for your trust in Carrer Hub. We can't wait to see you in action!
 
 Best regards,
 
-Carrer Hub 🏅
+MedHR+ 🏅
     `;
 
-  await sendEmail(user.email, "Welcome To Carrer Hub", emailMessage);
+  await sendEmail(user.email, "Welcome To MedHR+", emailMessage);
 
   sendToken(user, 200, res, "Account Verified", EMPLOYEE_AUTH_TOKEN);
 });
@@ -186,7 +186,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
   const message = `Dear ${user.name},
 
-    We hope this email finds you well. It appears that you've requested to reset your password for your Carrer Hub account. We're here to assist you in securely resetting your password and getting you back to enjoying our platform hassle-free.
+    We hope this email finds you well. It appears that you've requested to reset your password for your MedHR+ account. We're here to assist you in securely resetting your password and getting you back to enjoying our platform hassle-free.
 
     To reset your password, please click on the following link:
 
@@ -196,10 +196,10 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
     If you encounter any issues or have any questions, feel free to reach out to our support team at [support email] for further assistance. We're here to help you every step of the way.
 
-    Thank you for choosing Carrer Hub. We appreciate your continued support.
+    Thank you for choosing MedHR+. We appreciate your continued support.
 
     Best regards,
-    Carrer Hub Team`;
+    MedHR+ Team`;
 
   try {
     await sendEmail(
