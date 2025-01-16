@@ -21,7 +21,8 @@ app.use(
       "https://career-hub-frontend.vercel.app",
       "http://localhost:5173",
       "https://career-hub-pi.vercel.app",
-      "https://mefhr.vercel.app"
+      "https://mefhr.vercel.app",
+      "https://medhr.netlify.app"
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "PUT"],
