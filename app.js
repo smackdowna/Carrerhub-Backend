@@ -22,7 +22,8 @@ app.use(
       "http://localhost:5173",
       "https://career-hub-pi.vercel.app",
       "https://mefhr.vercel.app",
-      "https://medhr.netlify.app"
+      "https://medhr.netlify.app",
+      "https://www.medhrplus.com"
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "PUT"],
