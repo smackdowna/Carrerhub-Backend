@@ -267,15 +267,15 @@ exports.ApplyJob = catchAsyncErrors(async (req, res, next) => {
 
   const emailMessage = `Dear ${user.full_name},
 
-Thank you for choosing Carrer Hub! 🏆
+Thank you for choosing MedHr Plus! 🏆
 
 You Have Successfully Applied for ${jobs.title} for ${jobs.employmentType} Position
 
-Thank you for your trust in Carrer Hub.
+Thank you for your trust in MedHr Plus.
 
 Best regards,
 
-Carrer Hub 🏅
+MedHr Plus 🏅
     `;
 
   await sendEmail(
@@ -286,15 +286,15 @@ Carrer Hub 🏅
 
   const emailMessage2 = `Dear ${user.full_name},
 
-Thank you for choosing Carrer Hub! 🏆
+Thank you for choosing MedHr Plus! 🏆
 
 You Have Received a New Application  for ${jobs.title} for ${jobs.employmentType} Position
 
-Thank you for your trust in Carrer Hub.
+Thank you for your trust in MedHr Plus.
 
 Best regards,
 
-Carrer Hub 🏅
+MedHr Plus 🏅
     `;
 
   await sendEmail(employer, "New Application Received", emailMessage2);
