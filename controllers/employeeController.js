@@ -59,7 +59,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
   const emailMessage = `Dear ${user.full_name},
 
-Thank you for choosing Carrer Hub! 🏆
+Thank you for choosing MedHR Plus! 🏆
 
 To ensure the security of your account and expedite your registration process, please verify your account by entering the following One-Time Password (OTP):
 
@@ -71,7 +71,7 @@ Thank you for your trust in Carrer Hub. We can't wait to see you in action!
 
 Best regards,
 
-Carrer Hub 🏅
+MedHR Plus 🏅
     `;
 
   await sendEmail(email, "Verify your account", emailMessage);
