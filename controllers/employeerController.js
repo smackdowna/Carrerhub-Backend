@@ -60,7 +60,7 @@ exports.registerEmployeer = catchAsyncErrors(async (req, res, next) => {
 
   const emailMessage = `Dear ${user.full_name},
 
-Thank you for choosing Carrer Hub! 🏆
+Thank you for choosing MedHR Plus! 🏆
 
 To ensure the security of your account and expedite your registration process, please verify your account by entering the following One-Time Password (OTP):
 
@@ -68,11 +68,11 @@ OTP: ${otp}
 
 This OTP is exclusively for you and will expire after a limited time. 
   
-Thank you for your trust in Carrer Hub. We can't wait to see you in action!
+Thank you for your trust in MedHr Plus. We can't wait to see you in action!
 
 Best regards,
 
-Carrer Hub 🏅
+MedHR Plus 🏅
     `;
 
   await sendEmail(email, "Verify your account", emailMessage);
@@ -107,18 +107,18 @@ exports.verify = catchAsyncErrors(async (req, res, next) => {
 
   const emailMessage = `Dear ${user.full_name},
 
-Thank you for choosing Carrer Hub! 🏆
+Thank you for choosing MedHR Plus! 🏆
 
 You are a Verified User Start Posting JOb/Internship. 
   
-Thank you for your trust in Carrer Hub. We can't wait to see you in action!
+Thank you for your trust in MedHr Plus. We can't wait to see you in action!
 
 Best regards,
 
-Carrer Hub 🏅
+MedHR Plus 🏅
     `;
 
-  await sendEmail(user.email, "Welcome To Carrer Hub", emailMessage);
+  await sendEmail(user.email, "Welcome To MedHR Plus", emailMessage);
 
   sendToken(user, 200, res, "Account Verified", EMPLOYER_AUTH_TOKEN);
 });
@@ -186,7 +186,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
   const message = `Dear ${user.name},
 
-    We hope this email finds you well. It appears that you've requested to reset your password for your Carrer Hub account. We're here to assist you in securely resetting your password and getting you back to enjoying our platform hassle-free.
+    We hope this email finds you well. It appears that you've requested to reset your password for your MedHr Plus account. We're here to assist you in securely resetting your password and getting you back to enjoying our platform hassle-free.
 
     To reset your password, please click on the following link:
 
@@ -196,15 +196,15 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
     If you encounter any issues or have any questions, feel free to reach out to our support team at [support email] for further assistance. We're here to help you every step of the way.
 
-    Thank you for choosing Carrer Hub. We appreciate your continued support.
+    Thank you for choosing MedHr Plus. We appreciate your continued support.
 
     Best regards,
-    Carrer Hub Team`;
+    MedHr Plus Team`;
 
   try {
     await sendEmail(
       user.email,
-      "Password Reset Link for Carrer Hub Account",
+      "Password Reset Link for MedHr Plus Account",
       message
     );
 
