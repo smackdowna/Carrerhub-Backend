@@ -105,7 +105,7 @@ exports.deleteEmployer = catchAsyncErrors(async (req, res, next) => {
   if (!employer) {
     return next(new ErrorHandler("Employer doesn't exist with this ID", 404));
   }
-  await employer.remove();
+  await employer.deleteOne();
   res.status(200).json({
     success: true,
     message: "Employer deleted successfully",
@@ -143,7 +143,7 @@ exports.deleteEmployee = catchAsyncErrors(async (req, res, next) => {
   if (!employee) {
     return next(new ErrorHandler("Employee doesn't exist with this ID", 404));
   }
-  await employee.remove();
+  await employee.deleteOne();
   res.status(200).json({
     success: true,
     message: "Employee deleted successfully",
@@ -179,7 +179,7 @@ exports.deletejob = catchAsyncErrors(async (req, res, next) => {
   }
 
 
-  await job.remove();
+  await job.deleteOne();
   res.status(200).json({
     success: true,
     message: "Deleted Successfully",
