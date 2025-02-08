@@ -81,10 +81,6 @@ exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
   const jobsCount = await Jobs.countDocuments();
 
-exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
-  const resultPerPage = 15;
-  const jobsCount = await Jobs.countDocuments();
-
   const apiFeature = new ApiFeatures(
     Jobs.find().sort({ postedAt: -1 }),
     req.query
