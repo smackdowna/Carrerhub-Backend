@@ -199,25 +199,20 @@ exports.getAllEmployeerJob = catchAsyncErrors(async (req, res, next) => {
 
   const apiFeature = new ApiFeatures(
     Jobs.find({ postedBy: req.user.id }),
-    req.query,
+    req.query
   )
     .search()
-    .filter();
+    .filter()
+    .pagination(resultPerPage);  // ✅ Apply pagination BEFORE executing the query
 
-  let jobs = await apiFeature.query;
-
-  let filteredJobsCount = jobs.length;
-
-  apiFeature.pagination(resultPerPage);
-
-  jobs = await apiFeature.query;
+  const jobs = await apiFeature.query;  // ✅ Query executed only once
 
   res.status(200).json({
     success: true,
     jobsCount,
     jobs,
     resultPerPage,
-    filteredJobsCount,
+    filteredJobsCount: jobs.length,
   });
 });
 
