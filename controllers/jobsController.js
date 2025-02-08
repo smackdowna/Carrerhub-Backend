@@ -81,31 +81,29 @@ exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
   const jobsCount = await Jobs.countDocuments();
 
+exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
+  const resultPerPage = 15;
+  const jobsCount = await Jobs.countDocuments();
+
   const apiFeature = new ApiFeatures(
-    Jobs.find().sort({
-      postedAt: -1,
-    }),
-    req.query,
+    Jobs.find().sort({ postedAt: -1 }),
+    req.query
   )
     .search()
-    .filter();
+    .filter()
+    .pagination(resultPerPage); // Apply pagination before executing the query
 
-  let jobs = await apiFeature.query;
-
-  let filteredJobsCount = jobs.length;
-
-  apiFeature.pagination(resultPerPage);
-
-  jobs = await apiFeature.query;
+  const jobs = await apiFeature.query; // Execute the query only once
 
   res.status(200).json({
     success: true,
     jobsCount,
     jobs,
     resultPerPage,
-    filteredJobsCount,
+    filteredJobsCount: jobs.length, // No need for filteredJobsCount before query execution
   });
 });
+
 
 //get a single job--all user
 exports.getSingleJob = catchAsyncErrors(async (req, res, next) => {
@@ -136,7 +134,7 @@ exports.deletejob = catchAsyncErrors(async (req, res, next) => {
   // const created = job.postedBy;
 
   // if (userId == created) {
-  await job.remove();
+  await job.deleteOne();
 
   res.status(200).json({
     success: true,
@@ -366,7 +364,7 @@ exports.withdrawApplication = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("You have not  applied for the job", 404));
   }
 
-  // Remove the user's ID from the applicants array
+  // deleteOne the user's ID from the applicants array
   jobs.applicants = jobs.applicants.filter(
     (applicant) => applicant.employee.toString() !== userId,
   );
