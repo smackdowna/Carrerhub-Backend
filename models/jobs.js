@@ -76,7 +76,6 @@ const jobSchema = new mongoose.Schema({
     },
     websiteLink: {
       type: String,
-      required: true,
     },
     bio: {
       type: String,
