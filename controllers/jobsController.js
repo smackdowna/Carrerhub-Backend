@@ -46,6 +46,8 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please Enter All Fields", 400));
   }
 
+  const websiteLink = user.companyDetails[0].websiteLink ? user.companyDetails[0].websiteLink : "";
+
   job = await Jobs.create({
     title,
     description,
@@ -57,7 +59,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     companyDetails: {
       companyName: user.companyDetails[0].companyName,
       industryType: user.companyDetails[0].industryType,
-      websiteLink: user.companyDetails[0].websiteLink,
+      websiteLink,
       bio: user.companyDetails[0].bio,
       logo: user.company_avatar.url,
     },
