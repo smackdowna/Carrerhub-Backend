@@ -74,16 +74,6 @@ const empSchema = new mongoose.Schema({
       // fieldOfStudy: { type: String },
     },
   ],
-  experience: [
-    {
-      title: { type: String },
-      company: { type: String },
-      location: { type: String },
-      startDate: { type: Date },
-      endDate: { type: Date },
-      description: { type: String },
-    },
-  ],
   projects: [
     {
       title: { type: String },
@@ -91,6 +81,17 @@ const empSchema = new mongoose.Schema({
       startDate: { type: Date },
       endDate: { type: Date },
       link: { type: String },
+    },
+  ],
+  experience: [
+    {
+      designation: { type: String },
+      companyName: { type: String },
+      workType: { type: String },
+      startDate: { type: Date },
+      endDate: { type: Date },
+      description: { type: String },
+      projectLinks : {type : [String]}
     },
   ],
   certifications: [
