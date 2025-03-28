@@ -30,6 +30,29 @@ const empSchema = new mongoose.Schema({
   dob: {
     type: String,
   },
+  // Newly added by Rahul
+  gender : {
+    type: String,
+    required: [true, "Please Enter your gender"],
+    enum: ["Male", "Female", "Other"],
+  },
+  guardian : {
+    guardianName : {type: String, required: [true, "Please enter guardian name"]},
+    phoneNumber : {type: String, required: [true, "Please enter guardian phone number"]},
+    occupation : {type: String, required: [true, "Please enter guardian occupation"]}
+  },
+  preferredLanguages : {
+    type : [String],
+    required: [true, "Please enter at least one preferred language"]
+  },
+  currentlyLookingFor : {
+    type : [String],
+    required: [true, "Please enter at least one preferred language"]
+  },
+  areasOfInterests : {
+    type : [String],
+    required: [true, "Please enter at least one preferred interest"]
+  },
   address: [
     {
       street: { type: String, required: true },
@@ -41,11 +64,14 @@ const empSchema = new mongoose.Schema({
   ],
   education: [
     {
+      designation: { type: String },
       institutionName: { type: String },
-      degree: { type: String },
-      fieldOfStudy: { type: String },
+      city : {type : String},
+      courseName: { type: String },
+      grade : { type: String},
       startDate: { type: Date },
       endDate: { type: Date },
+      // fieldOfStudy: { type: String },
     },
   ],
   experience: [

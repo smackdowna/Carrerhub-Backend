@@ -322,6 +322,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 
 exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
   const {
+    personalInformation,
     address,
     education,
     experience,
@@ -329,8 +330,9 @@ exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
     certifications,
     skills,
     socialLinks,
-    interests, // Corrected spelling from 'intrests' to 'interests'
+    interests,
   } = req.body;
+  console.log(personalInformation);
 
   // Assuming req.user contains the authenticated user info
   const userId = req.user.id;
