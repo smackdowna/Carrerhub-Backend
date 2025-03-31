@@ -30,29 +30,37 @@ const empSchema = new mongoose.Schema({
   dob: {
     type: String,
   },
-  // Newly added by Rahul
-  gender : {
+  // Newly added by Rahul (Start)
+  gender: {
     type: String,
-    required: [true, "Please Enter your gender"],
     enum: ["Male", "Female", "Other"],
   },
-  guardian : {
-    guardianName : {type: String, required: [true, "Please enter guardian name"]},
-    phoneNumber : {type: String, required: [true, "Please enter guardian phone number"]},
-    occupation : {type: String, required: [true, "Please enter guardian occupation"]}
+  guardian: {
+    guardianName: {
+      type: String,
+    },
+    phoneNumber: {
+      type: String,
+    },
+    occupation: {
+      type: String,
+    },
   },
-  preferredLanguages : {
-    type : [String],
-    required: [true, "Please enter at least one preferred language"]
-  },
-  currentlyLookingFor : {
-    type : [String],
-    required: [true, "Please enter at least one preferred language"]
-  },
-  areasOfInterests : {
-    type : [String],
-    required: [true, "Please enter at least one preferred interest"]
-  },
+  preferredLanguages: [
+    {
+      type: String,
+    },
+  ],
+  areasOfInterests: [
+    {
+      type: String,
+    },
+  ],
+  currentlyLookingFor: [
+    {
+      type: String,
+    },
+  ],
   address: [
     {
       street: { type: String, required: true },
@@ -66,9 +74,9 @@ const empSchema = new mongoose.Schema({
     {
       designation: { type: String },
       institutionName: { type: String },
-      city : {type : String},
+      city: { type: String },
       courseName: { type: String },
-      grade : { type: String},
+      grade: { type: String },
       startDate: { type: Date },
       endDate: { type: Date },
       // fieldOfStudy: { type: String },
@@ -91,7 +99,7 @@ const empSchema = new mongoose.Schema({
       startDate: { type: Date },
       endDate: { type: Date },
       description: { type: String },
-      projectLinks : {type : [String]}
+      projectLinks: { type: [String] },
     },
   ],
   certifications: [
@@ -188,5 +196,9 @@ empSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
-empSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 }, { full_name: "text" });
+empSchema.index(
+  { otp_expiry: 1 },
+  { expireAfterSeconds: 0 },
+  { full_name: "text" }
+);
 module.exports = mongoose.model("Employee", empSchema);
