@@ -65,6 +65,7 @@ exports.logoutAdmin = catchAsyncErrors(async (req, res, next) => {
     message: "Admin Logged Out Successfully",
   });
 });
+
 exports.adminProfile = catchAsyncErrors(async (req, res, next) => {
   const admin = await Admin.findById(req.admin.id);
   res.status(200).json({
@@ -72,6 +73,7 @@ exports.adminProfile = catchAsyncErrors(async (req, res, next) => {
     admin,
   });
 });
+
 exports.getAllEmployers = catchAsyncErrors(async (req, res, next) => {
   const resultsPerPage = 15;
   const employersCount = await Employeer.countDocuments();
@@ -112,6 +114,7 @@ exports.deleteEmployer = catchAsyncErrors(async (req, res, next) => {
     data: employer
   });
 });
+
 exports.getAllEmployees = catchAsyncErrors(async (req, res, next) => {
   const resultsPerPage = 15;
   const employeeCount = await Employee.countDocuments();
@@ -127,6 +130,7 @@ exports.getAllEmployees = catchAsyncErrors(async (req, res, next) => {
     filteredEmployersCount,
   });
 });
+
 exports.getSingleEmployee = catchAsyncErrors(async (req, res, next) => {
   const employee = await Employee.findById(req.params.id);
   if (!employee) {
@@ -169,6 +173,7 @@ exports.counts = catchAsyncErrors(async (req, res, next) => {
     hiredApplicantsCount
   });
 });
+
 exports.deletejob = catchAsyncErrors(async (req, res, next) => {
   const job = await Jobs.findOne({
     _id: req.params.id,

@@ -10,6 +10,7 @@ const { EMPLOYER_AUTH_TOKEN } = require("../constants/cookies.constant");
 const ik = require("../config/imageKit.js");
 const fs = require("fs");
 const { uploadFile, deleteFile } = require("../utils/uploadFile.js");
+const employee = require("../models/employee.js");
 
 async function deleteUsersWithExpiredOTP() {
   try {
@@ -410,3 +411,43 @@ exports.updatePasswordEmployeer = catchAsyncErrors(async (req, res, next) => {
     message: "Password updated successfully ",
   });
 });
+
+
+// Find candidates
+exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
+  const { gender, location, skills, language, experience, designation, keyword } = req.query;
+  console.log(keyword);
+
+  // Constructing the query object dynamically
+  let query = {};
+
+  if (gender) query.gender = gender;
+  if (location) query["address.country"] = location;
+  if (designation) query.currentlyLookingFor = designation;
+  if (experience) query.experience = { $gte: parseInt(experience) };
+
+  // Handling array-based filtering for skills and language
+  if (skills) query.skills = { $in: skills.split(",") };
+  if (language) {
+    const languagesArray = Array.isArray(language) ? language : language.split(",");
+    query.preferredLanguages = { $in: languagesArray };
+  }
+  
+
+  // Search by keyword in employee name
+  if (keyword) query.full_name = { $regex: keyword, $options: "i" };
+
+  // Fetch candidates based on the constructed query
+  const candidates = await employee.find(query);
+
+  if (!candidates.length) {
+    return next(new ErrorHandler("No candidates found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    candidates,
+  });
+});
+
+

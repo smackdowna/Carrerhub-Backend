@@ -11,6 +11,7 @@ const {
   EnterEmployeerDetails,
   getEmployerDetails,
   updateEmployeerDetails,
+  findCandidates,
 } = require("../controllers/employeerController");
 const { updatePassword } = require("../controllers/employeeController");
 const { getSingleEmployee } = require("../controllers/jobsController");
@@ -40,6 +41,8 @@ router
 
 //get emp profile
 router.route("/employeer/me").get(isAuthenticatedEmployeer, getEmployerDetails);
+
+router.route("/employeer/find-candidates").get(isAuthenticatedEmployeer, findCandidates);
 
 router
   .route("/employeer/me/update")
