@@ -415,29 +415,38 @@ exports.updatePasswordEmployeer = catchAsyncErrors(async (req, res, next) => {
 
 // Find candidates
 exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
-  const { gender, location, skills, language, experience, designation, keyword } = req.query;
-  console.log(keyword);
+  const { gender, country, city, skills, language, experience, designation, keyword } = req.query;
 
-  // Constructing the query object dynamically
   let query = {};
 
   if (gender) query.gender = gender;
-  if (location) query["address.country"] = location;
-  if (designation) query.currentlyLookingFor = designation;
+  if (country) query["address.country"] = country;
+  if (city) query["address.city"] = city;
+  if (designation) {
+    const designationArray = Array.isArray(designation) ? designation.split(",") : [designation];
+    query.areasOfInterests = {
+      $elemMatch: { $regex: designationArray.join("|"), $options: "i" }
+    };
+  };
+  
   if (experience) query.experience = { $gte: parseInt(experience) };
 
-  // Handling array-based filtering for skills and language
-  if (skills) query.skills = { $in: skills.split(",") };
+  // Filter by skills (Array)
+  if (skills) {
+    const skillsArray = Array.isArray(skills) ? skills : skills.split(",");
+    query.skills = { $in: skillsArray };
+  };
+
+  // Filter by language (Array)
   if (language) {
     const languagesArray = Array.isArray(language) ? language : language.split(",");
     query.preferredLanguages = { $in: languagesArray };
-  }
+  };
   
-
   // Search by keyword in employee name
   if (keyword) query.full_name = { $regex: keyword, $options: "i" };
 
-  // Fetch candidates based on the constructed query
+  // Fetch candidates based on query
   const candidates = await employee.find(query);
 
   if (!candidates.length) {
