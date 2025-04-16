@@ -160,10 +160,6 @@ console.log(emailMessage);
   });
 });
 
-// write a function to print all the even numbers from 1-100
-
-
-
 
 //login user
 exports.loginEmployeer = catchAsyncErrors(async (req, res, next) => {
