@@ -76,7 +76,7 @@ Best regards,
 MedHR Plus 🏅
     `;
 
-  await sendEmail(email, "Verify your account", emailMessage);
+  // await sendEmail(email, "Verify your account", emailMessage);
 
   res.status(201).json({
     success: true,
@@ -123,6 +123,47 @@ MedHR Plus 🏅
 
   sendToken(user, 200, res, "Account Verified", EMPLOYER_AUTH_TOKEN);
 });
+
+//send email to employee
+exports.sendHiredEmail = catchAsyncErrors(async (req, res, next) => {
+  const { userId } = req.params;
+
+  const user = await employee.findById(userId);
+
+  if (!user) {
+    return next(new ErrorHandler("Candidate not found", 404));
+  }
+
+  const emailMessage = `Dear ${user?.full_name},
+
+🎉 Congratulations! 🎉
+
+We are thrilled to inform you that you have been selected for the job position you applied for through MedHR Plus.
+
+Your dedication and profile impressed the hiring team, and we’re excited to have you on board!
+
+Please expect further communication from the employer regarding next steps. In the meantime, feel free to explore other opportunities on MedHR Plus.
+
+Welcome to a new chapter of your career journey 🚀
+
+Best regards,  
+MedHR Plus Team
+`;
+
+console.log(emailMessage);
+
+  await sendEmail(user?.email, "🎉 You're Hired – Welcome Aboard!", emailMessage);
+
+  return res.status(200).json({
+    success: true,
+    message: "Hired email sent successfully to the candidate.",
+  });
+});
+
+// write a function to print all the even numbers from 1-100
+
+
+
 
 //login user
 exports.loginEmployeer = catchAsyncErrors(async (req, res, next) => {
@@ -295,6 +336,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 //     message: "Details Updated Successfully",
 //   });
 // });
+
 exports.EnterEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
   const { address, companyDetails } = req.body;
 
@@ -411,7 +453,6 @@ exports.updatePasswordEmployeer = catchAsyncErrors(async (req, res, next) => {
     message: "Password updated successfully ",
   });
 });
-
 
 // Find candidates
 exports.findCandidates = catchAsyncErrors(async (req, res, next) => {

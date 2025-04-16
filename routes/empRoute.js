@@ -15,6 +15,7 @@ const {
 
 const { isAuthenticatedUser } = require("../middleware/auth");
 const singleUpload = require("../middleware/multer");
+const { sendHiredEmail } = require("../controllers/employeerController");
 
 const router = express.Router();
 
@@ -28,6 +29,8 @@ router.route("/login").post(loginUser);
 
 //forgot password
 router.route("/password/forgot").post(forgotPassword);
+
+router.post("/send-hired-email/:userId", sendHiredEmail);
 
 //reset password
 router.route("/password/reset/:token").put(resetPassword);
