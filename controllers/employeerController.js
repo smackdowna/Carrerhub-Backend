@@ -127,6 +127,7 @@ MedHR Plus 🏅
 //send email to employee
 exports.sendHiredEmail = catchAsyncErrors(async (req, res, next) => {
   const { userId } = req.params;
+  const { companyName } = req.body;
 
   const user = await employee.findById(userId);
 
@@ -138,7 +139,7 @@ exports.sendHiredEmail = catchAsyncErrors(async (req, res, next) => {
 
 🎉 Congratulations! 🎉
 
-We are thrilled to inform you that you have been selected for the job position you applied for through MedHR Plus.
+We are thrilled to inform you that you have been selected at ${companyName} for the job position you applied for through MedHR Plus.
 
 Your dedication and profile impressed the hiring team, and we’re excited to have you on board!
 
@@ -150,7 +151,7 @@ Best regards,
 MedHR Plus Team
 `;
 
-console.log(emailMessage);
+  console.log(emailMessage);
 
   await sendEmail(user?.email, "🎉 You're Hired – Welcome Aboard!", emailMessage);
 
@@ -159,6 +160,7 @@ console.log(emailMessage);
     message: "Hired email sent successfully to the candidate.",
   });
 });
+
 
 
 //login user
