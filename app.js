@@ -24,7 +24,8 @@ app.use(
       "https://mefhr.vercel.app",
       "https://medhr.netlify.app",
       "https://www.medhrplus.com",
-      "https://medhrplus.com"
+      "https://medhrplus.com",
+      "https://medhrplus.netlify.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "PUT"],

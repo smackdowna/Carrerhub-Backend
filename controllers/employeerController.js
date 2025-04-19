@@ -153,15 +153,17 @@ MedHR Plus Team
 
   console.log(emailMessage);
 
-  await sendEmail(user?.email, "🎉 You're Hired – Welcome Aboard!", emailMessage);
+  await sendEmail(
+    user?.email,
+    "🎉 You're Hired – Welcome Aboard!",
+    emailMessage
+  );
 
   return res.status(200).json({
     success: true,
     message: "Hired email sent successfully to the candidate.",
   });
 });
-
-
 
 //login user
 exports.loginEmployeer = catchAsyncErrors(async (req, res, next) => {
@@ -349,11 +351,10 @@ exports.EnterEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
   if (companyDetails) updateFields.companyDetails = companyDetails;
 
   // Update user details in the database only with the provided fields
-  const updatedUser = await Employeer.findByIdAndUpdate(
-    userId,
-    updateFields,
-    { new: true, runValidators: true }
-  );
+  const updatedUser = await Employeer.findByIdAndUpdate(userId, updateFields, {
+    new: true,
+    runValidators: true,
+  });
 
   if (!updatedUser) {
     return next(new ErrorHandler("User not found", 404));
@@ -364,7 +365,6 @@ exports.EnterEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
     message: "Details Updated Successfully",
   });
 });
-
 
 //get employer profile
 exports.getEmployerDetails = catchAsyncErrors(async (req, res, next) => {
@@ -399,8 +399,12 @@ exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
 
     if (file) {
       const fileUri = getDataUri(file);
-      const result = await uploadFile(fileUri.content, fileUri.fileName, "company_avatar");
-      console.log(result)
+      const result = await uploadFile(
+        fileUri.content,
+        fileUri.fileName,
+        "company_avatar"
+      );
+      console.log(result);
       if (user.company_avatar.public_id && user.company_avatar.url) {
         await deleteFile(user.company_avatar.public_id);
       }
@@ -420,7 +424,7 @@ exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
     res.status(500).json({
       success: false,
       message: "Something went wrong!",
-      error: error
+      error: error,
     });
   }
 });
@@ -454,7 +458,16 @@ exports.updatePasswordEmployeer = catchAsyncErrors(async (req, res, next) => {
 
 // Find candidates
 exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
-  const { gender, country, city, skills, language, experience, designation, keyword } = req.query;
+  const {
+    gender,
+    country,
+    city,
+    skills,
+    language,
+    experience,
+    designation,
+    keyword,
+  } = req.query;
 
   let query = {};
 
@@ -462,26 +475,30 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
   if (country) query["address.country"] = country;
   if (city) query["address.city"] = city;
   if (designation) {
-    const designationArray = Array.isArray(designation) ? designation.split(",") : [designation];
+    const designationArray = Array.isArray(designation)
+      ? designation.split(",")
+      : [designation];
     query.areasOfInterests = {
-      $elemMatch: { $regex: designationArray.join("|"), $options: "i" }
+      $elemMatch: { $regex: designationArray.join("|"), $options: "i" },
     };
-  };
-  
+  }
+
   if (experience) query.experience = { $gte: parseInt(experience) };
 
   // Filter by skills (Array)
   if (skills) {
     const skillsArray = Array.isArray(skills) ? skills : skills.split(",");
     query.skills = { $in: skillsArray };
-  };
+  }
 
   // Filter by language (Array)
   if (language) {
-    const languagesArray = Array.isArray(language) ? language : language.split(",");
+    const languagesArray = Array.isArray(language)
+      ? language
+      : language.split(",");
     query.preferredLanguages = { $in: languagesArray };
-  };
-  
+  }
+
   // Search by keyword in employee name
   if (keyword) query.full_name = { $regex: keyword, $options: "i" };
 
@@ -497,5 +514,3 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
     candidates,
   });
 });
-
-
