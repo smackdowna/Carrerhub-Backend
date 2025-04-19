@@ -30,32 +30,54 @@ const empSchema = new mongoose.Schema({
   dob: {
     type: String,
   },
-  address: [
+  // Newly added by Rahul (Start)
+  gender: {
+    type: String,
+    enum: ["Male", "Female", "Other"],
+  },
+  guardian: {
+    guardianName: {
+      type: String,
+    },
+    phoneNumber: {
+      type: String,
+    },
+    occupation: {
+      type: String,
+    },
+  },
+  preferredLanguages: [
     {
-      street: { type: String, required: true },
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      postalCode: { type: String, required: true },
-      country: { type: String, required: true },
+      type: String,
     },
   ],
+  areasOfInterests: [
+    {
+      type: String,
+    },
+  ],
+  currentlyLookingFor: [
+    {
+      type: String,
+    },
+  ],
+  address: {
+      street: { type: String },
+      city: { type: String },
+      postalCode: { type: String },
+      state: { type: String },
+      country: { type: String },
+    },
   education: [
     {
+      designationType: { type: String },
       institutionName: { type: String },
-      degree: { type: String },
-      fieldOfStudy: { type: String },
+      city: { type: String },
+      courseName: { type: String },
+      grade: { type: String },
       startDate: { type: Date },
       endDate: { type: Date },
-    },
-  ],
-  experience: [
-    {
-      title: { type: String },
-      company: { type: String },
-      location: { type: String },
-      startDate: { type: Date },
-      endDate: { type: Date },
-      description: { type: String },
+      // fieldOfStudy: { type: String },
     },
   ],
   projects: [
@@ -67,12 +89,24 @@ const empSchema = new mongoose.Schema({
       link: { type: String },
     },
   ],
+  experience: [
+    {
+      designation: { type: String },
+      companyName: { type: String },
+      workType: { type: String },
+      startDate: { type: Date },
+      endDate: { type: Date },
+      description: { type: String },
+      companyLocation: { type: String },
+      projectLinks: { type: [String] },
+    },
+  ],
   certifications: [
     {
       name: { type: String },
       issuingOrganization: { type: String },
       issueDate: { type: Date },
-      expirationDate: { type: Date },
+      // expirationDate: { type: Date },
       credentialID: { type: String },
       credentialURL: { type: String },
     },
@@ -100,8 +134,22 @@ const empSchema = new mongoose.Schema({
   ],
   socialLinks: {
     linkedin: { type: String },
+    facebook: { type: String },
+    instagram: { type: String },
+    twitter: { type: String },
     github: { type: String },
-  },
+    youtube: { type: String },
+    dribble: { type: String },
+    behance: { type: String },
+    medium: { type: String },
+    stackoverflow: { type: String },
+    reddit: { type: String },
+    tiktok: { type: String },
+    snapchat: { type: String },
+    pinterest: { type: String },
+    telegram: { type: String },
+    discord: { type: String },
+  },  
   interests: [
     {
       type: String,
@@ -161,5 +209,9 @@ empSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
-empSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 }, { full_name: "text" });
+empSchema.index(
+  { otp_expiry: 1 },
+  { expireAfterSeconds: 0 },
+  { full_name: "text" }
+);
 module.exports = mongoose.model("Employee", empSchema);

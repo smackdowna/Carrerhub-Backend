@@ -46,7 +46,9 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please Enter All Fields", 400));
   }
 
-  const websiteLink = user.companyDetails[0].websiteLink ? user.companyDetails[0].websiteLink : "";
+  const websiteLink = user.companyDetails[0].websiteLink
+    ? user.companyDetails[0].websiteLink
+    : "";
 
   job = await Jobs.create({
     title,
@@ -83,25 +85,46 @@ exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
   const jobsCount = await Jobs.countDocuments();
 
-  const apiFeature = new ApiFeatures(
-    Jobs.find().sort({ postedAt: -1 }),
-    req.query
-  )
+  let query = Jobs.find().sort({ postedAt: -1 });
+
+  // 👇 Custom filters handled manually (without modifying .filter())
+  const { employmentType, locationType, location } = req.query;
+
+  if (employmentType) {
+    query = query.find({
+      employmentType: { $regex: employmentType, $options: "i" },
+    });
+  }
+
+  if (locationType) {
+    query = query.find({
+      locationType: { $regex: locationType, $options: "i" },
+    });
+  }
+
+  if (location) {
+    const locations = Array.isArray(location) ? location : [location];
+    query = query.find({
+      location: { $in: locations.map((loc) => new RegExp(loc, "i")) },
+    });
+  }
+
+  // Apply reusable ApiFeatures after custom filters
+  const apiFeature = new ApiFeatures(query, req.query)
     .search()
     .filter()
-    .pagination(resultPerPage); // Apply pagination before executing the query
+    .pagination(resultPerPage);
 
-  const jobs = await apiFeature.query; // Execute the query only once
+  const jobs = await apiFeature.query;
 
   res.status(200).json({
     success: true,
     jobsCount,
     jobs,
     resultPerPage,
-    filteredJobsCount: jobs.length, // No need for filteredJobsCount before query execution
+    filteredJobsCount: jobs.length,
   });
 });
-
 
 //get a single job--all user
 exports.getSingleJob = catchAsyncErrors(async (req, res, next) => {
@@ -205,9 +228,9 @@ exports.getAllEmployeerJob = catchAsyncErrors(async (req, res, next) => {
   )
     .search()
     .filter()
-    .pagination(resultPerPage);  // ✅ Apply pagination BEFORE executing the query
+    .pagination(resultPerPage); // ✅ Apply pagination BEFORE executing the query
 
-  const jobs = await apiFeature.query;  // ✅ Query executed only once
+  const jobs = await apiFeature.query; // ✅ Query executed only once
 
   res.status(200).json({
     success: true,
@@ -222,7 +245,7 @@ exports.getAllEmployeerJob = catchAsyncErrors(async (req, res, next) => {
 exports.ApplyJob = catchAsyncErrors(async (req, res, next) => {
   const jobs = await Jobs.findById(req.params.id).populate(
     "postedBy",
-    "name email",
+    "name email"
   );
 
   const employer = jobs.postedBy.email;
@@ -242,7 +265,7 @@ exports.ApplyJob = catchAsyncErrors(async (req, res, next) => {
   // Check if the user has already applied
   if (
     jobs.applicants.find(
-      (applicant) => applicant.employee.toString() === userId,
+      (applicant) => applicant.employee.toString() === userId
     )
   ) {
     return next(new ErrorHandler("You have already applied for the job", 404));
@@ -272,7 +295,7 @@ MedHr Plus 🏅
   await sendEmail(
     user.email,
     "Application Successfully Received",
-    emailMessage,
+    emailMessage
   );
 
   const emailMessage2 = `Dear ${user.full_name},
@@ -317,7 +340,7 @@ exports.getAllEmployeeJob = catchAsyncErrors(async (req, res, next) => {
         },
       },
     }),
-    req.query,
+    req.query
   )
     .search()
     .filter();
@@ -351,7 +374,7 @@ exports.withdrawApplication = catchAsyncErrors(async (req, res, next) => {
   // Check if the user has already applied
   if (
     !jobs.applicants.find(
-      (applicant) => applicant.employee.toString() === userId,
+      (applicant) => applicant.employee.toString() === userId
     )
   ) {
     return next(new ErrorHandler("You have not  applied for the job", 404));
@@ -359,7 +382,7 @@ exports.withdrawApplication = catchAsyncErrors(async (req, res, next) => {
 
   // deleteOne the user's ID from the applicants array
   jobs.applicants = jobs.applicants.filter(
-    (applicant) => applicant.employee.toString() !== userId,
+    (applicant) => applicant.employee.toString() !== userId
   );
 
   // Save the updated job document
@@ -393,7 +416,7 @@ exports.manageAppliedJobs = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("You have not created this job!", 404));
   }
   let applicationStatus = job.applicants.find(
-    (applicant) => applicant.employee.toString() === applicantId,
+    (applicant) => applicant.employee.toString() === applicantId
   );
   if (!applicationStatus) {
     return next(new ErrorHandler("User has not applied for this job!", 404));
@@ -416,12 +439,12 @@ exports.jobIsViewed = catchAsyncErrors(async (req, res, next) => {
   }
 
   const isApplied = job.applicants.find(
-    (applicant) => applicant.employee.toString() === applicantId,
+    (applicant) => applicant.employee.toString() === applicantId
   );
 
   if (!isApplied) {
     return next(
-      new ErrorHandler("This user with has not applied for this job!", 404),
+      new ErrorHandler("This user with has not applied for this job!", 404)
     );
   }
   isApplied.isViewed = true;

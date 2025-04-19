@@ -67,18 +67,18 @@ OTP: ${otp}
 
 This OTP is exclusively for you and will expire after a limited time. 
   
-Thank you for your trust in Carrer Hub. We can't wait to see you in action!
+Thank you for your trust in MeDHr Plus. We can't wait to see you in action!
 
 Best regards,
 
 MedHR Plus 🏅
     `;
 
-  await sendEmail(email, "Verify your account", emailMessage);
+  // await sendEmail(email, "Verify your account", emailMessage);
 
   res.status(201).json({
     success: true,
-    message: "OTP sent to your registered Email ID",
+    message: `OTP sent to ${email}`,
   });
 });
 
@@ -117,7 +117,7 @@ Best regards,
 MedHR+ 🏅
     `;
 
-  await sendEmail(user.email, "Welcome To MedHR+", emailMessage);
+  // await sendEmail(user.email, "Welcome To MedHR+", emailMessage);
 
   sendToken(user, 200, res, "Account Verified", EMPLOYEE_AUTH_TOKEN);
 });
@@ -317,11 +317,14 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 //   });
 // });
 
-
-
-
 exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
   const {
+    dob,
+    gender,
+    guardian,
+    preferredLanguages,
+    areasOfInterests,
+    currentlyLookingFor,
     address,
     education,
     experience,
@@ -329,7 +332,7 @@ exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
     certifications,
     skills,
     socialLinks,
-    interests, // Corrected spelling from 'intrests' to 'interests'
+    interests,
   } = req.body;
 
   // Assuming req.user contains the authenticated user info
@@ -339,6 +342,12 @@ exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
   const updateFields = {};
 
   // Dynamically add fields to updateFields if they are provided in the request
+  if (dob) updateFields.dob = dob;
+  if (gender) updateFields.gender = gender;
+  if (guardian) updateFields.guardian = guardian;
+  if (preferredLanguages) updateFields.preferredLanguages = preferredLanguages;
+  if (areasOfInterests) updateFields.areasOfInterests = areasOfInterests;
+  if (currentlyLookingFor) updateFields.currentlyLookingFor = currentlyLookingFor;
   if (address) updateFields.address = address;
   if (education) updateFields.education = education;
   if (experience) updateFields.experience = experience;
@@ -349,11 +358,10 @@ exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
   if (interests) updateFields.interests = interests;
 
   // Update user details in the database only with the provided fields
-  const updatedUser = await Emp.findByIdAndUpdate(
-    userId,
-    updateFields,
-    { new: true, runValidators: true }
-  );
+  const updatedUser = await Emp.findByIdAndUpdate(userId, updateFields, {
+    new: true,
+    runValidators: true,
+  });
 
   if (!updatedUser) {
     return next(new ErrorHandler("User not found", 404));

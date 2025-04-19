@@ -10,6 +10,7 @@ const { EMPLOYER_AUTH_TOKEN } = require("../constants/cookies.constant");
 const ik = require("../config/imageKit.js");
 const fs = require("fs");
 const { uploadFile, deleteFile } = require("../utils/uploadFile.js");
+const employee = require("../models/employee.js");
 
 async function deleteUsersWithExpiredOTP() {
   try {
@@ -75,7 +76,7 @@ Best regards,
 MedHR Plus 🏅
     `;
 
-  await sendEmail(email, "Verify your account", emailMessage);
+  // await sendEmail(email, "Verify your account", emailMessage);
 
   res.status(201).json({
     success: true,
@@ -122,6 +123,45 @@ MedHR Plus 🏅
 
   sendToken(user, 200, res, "Account Verified", EMPLOYER_AUTH_TOKEN);
 });
+
+//send email to employee
+exports.sendHiredEmail = catchAsyncErrors(async (req, res, next) => {
+  const { userId } = req.params;
+  const { companyName } = req.body;
+
+  const user = await employee.findById(userId);
+
+  if (!user) {
+    return next(new ErrorHandler("Candidate not found", 404));
+  }
+
+  const emailMessage = `Dear ${user?.full_name},
+
+🎉 Congratulations! 🎉
+
+We are thrilled to inform you that you have been selected at ${companyName} for the job position you applied for through MedHR Plus.
+
+Your dedication and profile impressed the hiring team, and we’re excited to have you on board!
+
+Please expect further communication from the employer regarding next steps. In the meantime, feel free to explore other opportunities on MedHR Plus.
+
+Welcome to a new chapter of your career journey 🚀
+
+Best regards,  
+MedHR Plus Team
+`;
+
+  console.log(emailMessage);
+
+  await sendEmail(user?.email, "🎉 You're Hired – Welcome Aboard!", emailMessage);
+
+  return res.status(200).json({
+    success: true,
+    message: "Hired email sent successfully to the candidate.",
+  });
+});
+
+
 
 //login user
 exports.loginEmployeer = catchAsyncErrors(async (req, res, next) => {
@@ -294,6 +334,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 //     message: "Details Updated Successfully",
 //   });
 // });
+
 exports.EnterEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
   const { address, companyDetails } = req.body;
 
@@ -410,3 +451,51 @@ exports.updatePasswordEmployeer = catchAsyncErrors(async (req, res, next) => {
     message: "Password updated successfully ",
   });
 });
+
+// Find candidates
+exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
+  const { gender, country, city, skills, language, experience, designation, keyword } = req.query;
+
+  let query = {};
+
+  if (gender) query.gender = gender;
+  if (country) query["address.country"] = country;
+  if (city) query["address.city"] = city;
+  if (designation) {
+    const designationArray = Array.isArray(designation) ? designation.split(",") : [designation];
+    query.areasOfInterests = {
+      $elemMatch: { $regex: designationArray.join("|"), $options: "i" }
+    };
+  };
+  
+  if (experience) query.experience = { $gte: parseInt(experience) };
+
+  // Filter by skills (Array)
+  if (skills) {
+    const skillsArray = Array.isArray(skills) ? skills : skills.split(",");
+    query.skills = { $in: skillsArray };
+  };
+
+  // Filter by language (Array)
+  if (language) {
+    const languagesArray = Array.isArray(language) ? language : language.split(",");
+    query.preferredLanguages = { $in: languagesArray };
+  };
+  
+  // Search by keyword in employee name
+  if (keyword) query.full_name = { $regex: keyword, $options: "i" };
+
+  // Fetch candidates based on query
+  const candidates = await employee.find(query);
+
+  if (!candidates.length) {
+    return next(new ErrorHandler("No candidates found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    candidates,
+  });
+});
+
+
