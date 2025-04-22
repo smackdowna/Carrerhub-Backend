@@ -60,7 +60,7 @@ exports.getAllEvents = catchAsyncErrors(async (req, res, next) => {
   const events = await Event.find().populate("createdBy", "full_name email");
   res.status(200).json({
     success: true,
-    events,
+    data : events,
   });
 });
 
@@ -79,6 +79,25 @@ exports.getEventById = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    event,
+    data : event,
   });
 });
+
+// Delete an event by ID
+exports.deleteEvent = catchAsyncErrors(async (req, res, next) => {
+    const { id } = req.params;
+  
+    const event = await Event.findById(id);
+  
+    if (!event) {
+      return next(new ErrorHandler("Event not found", 404));
+    }
+  
+    await event.deleteOne();
+  
+    res.status(200).json({
+      success: true,
+      message: "Event deleted successfully",
+    });
+  });
+  

@@ -1,11 +1,12 @@
 const express = require("express");
 const { isAuthenticatedAdmin } = require("../middleware/auth");
 const singleUpload = require("../middleware/multer");
-const { createEvent, getAllEvents, getEventById } = require("../controllers/eventController");
+const { createEvent, getAllEvents, getEventById, deleteEvent } = require("../controllers/eventController");
 const router = express.Router();
 
 // Only for admin
 router.post("/admin/events/create-event", isAuthenticatedAdmin, singleUpload, createEvent);
+router.delete("/events/:id", isAuthenticatedAdmin, deleteEvent);
 
 // Public routes
 router.get("/events", getAllEvents);
