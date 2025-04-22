@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const companySchema = new mongoose.Schema({
   companyName: { type: String, required: true },
@@ -23,4 +23,4 @@ const eventSchema = new mongoose.Schema({
   },
 });
 
-export const Event = mongoose.model("Event", eventSchema);
+module.exports = mongoose.model("Event", eventSchema);

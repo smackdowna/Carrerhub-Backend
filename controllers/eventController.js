@@ -1,9 +1,10 @@
-const catchAsyncErrors = require("../middleware/catchAsyncError");
-const { Event } = require("../models/events");
+const Event = require("../models/events.js");
 const getDataUri = require("../utils/dataUri");
 const ErrorHandler = require("../utils/errorhandler");
 const { uploadFile } = require("../utils/uploadFile");
+const catchAsyncErrors = require("../middleware/catchAsyncError");
 
+// Get all events
 exports.createEvent = catchAsyncErrors(async (req, res, next) => {
   const { date, time, eventName, company, skillCovered } = req.body;
 
@@ -54,10 +55,30 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+// Get all events
 exports.getAllEvents = catchAsyncErrors(async (req, res, next) => {
-    const events = await Event.find().populate("createdBy", "full_name email");
-    res.status(200).json({
-      success: true,
-      events,
-    });
+  const events = await Event.find().populate("createdBy", "full_name email");
+  res.status(200).json({
+    success: true,
+    events,
   });
+});
+
+// Get single event by ID
+exports.getEventById = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+
+  const event = await Event.findById(id).populate(
+    "createdBy",
+    "full_name email"
+  );
+
+  if (!event) {
+    return next(new ErrorHandler("Event not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    event,
+  });
+});
