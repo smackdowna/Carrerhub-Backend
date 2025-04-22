@@ -53,3 +53,11 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
+exports.getAllEvents = catchAsyncErrors(async (req, res, next) => {
+    const events = await Event.find().populate("createdBy", "full_name email");
+    res.status(200).json({
+      success: true,
+      events,
+    });
+  });
