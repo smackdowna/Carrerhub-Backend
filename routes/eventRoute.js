@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Only for admin
 router.post("/admin/events/create-event", isAuthenticatedAdmin, singleUpload, createEvent);
-router.delete("/events/:id", isAuthenticatedAdmin, deleteEvent);
+router.delete("/admin/events/:id", isAuthenticatedAdmin, deleteEvent);
 
 // Public routes
 router.get("/events", getAllEvents);

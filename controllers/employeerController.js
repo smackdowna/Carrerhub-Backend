@@ -76,7 +76,7 @@ Best regards,
 MedHR Plus 🏅
     `;
 
-  // await sendEmail(email, "Verify your account", emailMessage);
+  await sendEmail(email, "Verify your account", emailMessage);
 
   res.status(201).json({
     success: true,
