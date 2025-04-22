@@ -387,7 +387,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
 exports.updateUserDetails = catchAsyncErrors(async (req, res, next) => {
   const { full_name, email, mobilenumber, dob } = req.body;
 
-  const file = req.file; // Assuming you are using multer or similar middleware for file uploads
+  const file = req.file;
 
   const user = await Emp.findById(req.user.id);
 

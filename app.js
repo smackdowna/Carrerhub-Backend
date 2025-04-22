@@ -40,6 +40,7 @@ const admin = require("./routes/adminRoute.js");
 const skills = require("./routes/skillsRoute.js");
 const videos = require("./routes/videoRoute.js");
 const courses = require("./routes/coursesRoute.js");
+const events = require("./routes/eventRoute.js");
 
 app.use("/api/v1", user);
 app.use("/api/v1", employeer);
@@ -48,6 +49,7 @@ app.use("/api/v1", admin);
 app.use("/api/v1", skills);
 app.use("/api/v1", videos);
 app.use("/api/v1", courses);
+app.use("/api/v1", events);
 
 module.exports = app;
 
