@@ -467,6 +467,8 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
     experience,
     designation,
     keyword,
+    currentlyLookingFor,
+    courseName,
   } = req.query;
 
   let query = {};
@@ -499,6 +501,27 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
     query.preferredLanguages = { $in: languagesArray };
   }
 
+  // Filter by currently looking for -(Interest) (Array)
+  if (currentlyLookingFor) {
+    const currentlyLookingForArray = Array.isArray(currentlyLookingFor)
+      ? currentlyLookingFor
+      : currentlyLookingFor.split(",");
+    query.currentlyLookingFor = { $in: currentlyLookingForArray };
+  }
+
+  // Filter by courseName (Array)
+  if (courseName) {
+    const courseNameArray = Array.isArray(courseName)
+      ? courseName
+      : courseName.split(",");
+  
+    query.education = {
+      $elemMatch: {
+        courseName: { $in: courseNameArray.map(name => new RegExp(name, "i")) }
+      },
+    };
+  }
+  
   // Search by keyword in employee name
   if (keyword) query.full_name = { $regex: keyword, $options: "i" };
 
