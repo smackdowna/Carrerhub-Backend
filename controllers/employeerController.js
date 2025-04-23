@@ -76,7 +76,7 @@ Best regards,
 MedHR Plus 🏅
     `;
 
-  // await sendEmail(email, "Verify your account", emailMessage);
+  await sendEmail(email, "Verify your account", emailMessage);
 
   res.status(201).json({
     success: true,
@@ -467,6 +467,9 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
     experience,
     designation,
     keyword,
+    currentlyLookingFor,
+    courseName,
+    designationType,
   } = req.query;
 
   let query = {};
@@ -499,6 +502,48 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
     query.preferredLanguages = { $in: languagesArray };
   }
 
+  // Filter by currently looking for -(Interest) (Array)
+  if (currentlyLookingFor) {
+    const currentlyLookingForArray = Array.isArray(currentlyLookingFor)
+      ? currentlyLookingFor
+      : currentlyLookingFor.split(",");
+    query.currentlyLookingFor = { $in: currentlyLookingForArray };
+  }
+
+  // Filter by courseName (Array)
+  if (courseName) {
+    const courseNameArray = Array.isArray(courseName)
+      ? courseName
+      : courseName.split(",");
+  
+    query.education = {
+      $elemMatch: {
+        courseName: { $in: courseNameArray.map(name => new RegExp(name, "i")) }
+      },
+    };
+  }
+
+  // Filter by designationType (Array)
+  if (designationType) {
+    const designationTypeArray = Array.isArray(designationType)
+      ? designationType
+      : designationType.split(",");
+  
+    if (query.education && query.education.$elemMatch) {
+      query.education.$elemMatch.designationType = {
+        $in: designationTypeArray.map(type => new RegExp(type, "i")),
+      };
+    } else {
+      query.education = {
+        $elemMatch: {
+          designationType: {
+            $in: designationTypeArray.map(type => new RegExp(type, "i")),
+          },
+        },
+      };
+    }
+  }
+  
   // Search by keyword in employee name
   if (keyword) query.full_name = { $regex: keyword, $options: "i" };
 
