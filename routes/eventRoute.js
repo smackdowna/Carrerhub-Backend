@@ -10,6 +10,6 @@ router.delete("/admin/events/:id", isAuthenticatedAdmin, deleteEvent);
 
 // Public routes
 router.get("/events", getAllEvents);
-router.get("/events/:id", getEventById);
+router.get("/event/:id", getEventById);
 
 module.exports = router;
