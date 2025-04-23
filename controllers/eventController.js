@@ -6,9 +6,9 @@ const catchAsyncErrors = require("../middleware/catchAsyncError");
 
 // Get all events
 exports.createEvent = catchAsyncErrors(async (req, res, next) => {
-  const { date, time, eventName, company, skillCovered } = req.body;
+  const { date, time, eventName, eventUrl, company, skillCovered } = req.body;
 
-  if (!date || !time || !eventName || !company || !skillCovered) {
+  if (!date || !time || !eventName || !eventUrl || !company || !skillCovered) {
     return next(new ErrorHandler("Please Enter All Fields", 400));
   }
 
@@ -29,6 +29,7 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
       date,
       time,
       eventName,
+      eventUrl,
       company: JSON.parse(company),
       skillCovered: JSON.parse(skillCovered),
       image: {
@@ -85,7 +86,7 @@ exports.getEventById = catchAsyncErrors(async (req, res, next) => {
 // Update event by id
 exports.updateEvent = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
-  let { eventName, date, time, company, skillCovered } = req.body;
+  let { eventName, eventUrl, date, time, company, skillCovered } = req.body;
 
   const event = await Event.findById(id);
 
@@ -95,6 +96,7 @@ exports.updateEvent = catchAsyncErrors(async (req, res, next) => {
 
   // Update simple fields
   if (eventName) event.eventName = eventName;
+  if (eventUrl) event.eventUrl = eventUrl;
   if (date) event.date = date;
   if (time) event.time = time;
 

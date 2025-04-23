@@ -12,6 +12,7 @@ const eventSchema = new mongoose.Schema({
     url: { type: String, required: true },
   },
   eventName: { type: String, required: true },
+  eventUrl: { type: String, required: true },
   date: { type: String, required: true },
   time: { type: String, required: true },
   company: { type: companySchema, required: true },
