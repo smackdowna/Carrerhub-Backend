@@ -510,7 +510,7 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
     query.currentlyLookingFor = { $in: currentlyLookingForArray };
   }
 
-  // Filter by courseName (Array)
+  // Filter by Course Name (Multiple Array)
   if (courseName) {
     const courseNameArray = Array.isArray(courseName)
       ? courseName
