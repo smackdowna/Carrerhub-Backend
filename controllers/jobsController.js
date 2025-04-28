@@ -91,14 +91,13 @@ exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
   let query = Jobs.find().sort({ postedAt: -1 });
 
   // 👇 Custom filters handled manually (without modifying .filter())
-  const { employmentType, employmentTypeCategory, locationType, location } =
-    req.query;
+  const { employmentTypeCategory, locationType, location } = req.query;
 
-  if (employmentType) {
-    query = query.find({
-      employmentType: { $regex: employmentType, $options: "i" },
-    });
-  }
+  // if (employmentType) {
+  //   query = query.find({
+  //     employmentType: { $regex: employmentType, $options: "i" },
+  //   });
+  // }
 
   if (employmentTypeCategory) {
     query = query.find({
