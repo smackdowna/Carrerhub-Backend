@@ -54,9 +54,25 @@ const jobSchema = new mongoose.Schema({
   },
   employmentType: {
     type: String,
-    enum: ["Full-Time", "Part-Time", "Contract", "Internship"],
+    enum: ["Job", "Internship"],
     required: true,
   },
+  employmentTypeCategory: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function (value) {
+        if (this.employmentType === "Job") {
+          return ["Full-Time", "Part-Time", "Contract"].includes(value);
+        } else if (this.employmentType === "Internship") {
+          return ["Shadow Internship", "Practice Internship"].includes(value);
+        }
+        return false;
+      },
+      message: (props) => `${props.value} is not a valid employmentTypeCategory for ${props.instance.employmentType}`,
+    },
+  },
+  
   employmentDuration: {
     type: Number,
     required: true,

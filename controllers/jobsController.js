@@ -17,6 +17,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     responsibilities,
     locationType,
     employmentType,
+    employmentTypeCategory,
     employmentDuration,
     salary,
     applicationDeadline,
@@ -36,6 +37,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     !responsibilities ||
     !locationType ||
     !employmentType ||
+    !employmentTypeCategory ||
     !employmentDuration ||
     !salary ||
     !applicationDeadline ||
@@ -58,6 +60,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     responsibilities,
     locationType,
     employmentType,
+    employmentTypeCategory,
     companyDetails: {
       companyName: user.companyDetails[0].companyName,
       industryType: user.companyDetails[0].industryType,
@@ -88,11 +91,17 @@ exports.getAllJob = catchAsyncErrors(async (req, res, next) => {
   let query = Jobs.find().sort({ postedAt: -1 });
 
   // 👇 Custom filters handled manually (without modifying .filter())
-  const { employmentType, locationType, location } = req.query;
+  const { employmentTypeCategory, locationType, location } = req.query;
 
-  if (employmentType) {
+  // if (employmentType) {
+  //   query = query.find({
+  //     employmentType: { $regex: employmentType, $options: "i" },
+  //   });
+  // }
+
+  if (employmentTypeCategory) {
     query = query.find({
-      employmentType: { $regex: employmentType, $options: "i" },
+      employmentTypeCategory: { $regex: employmentTypeCategory, $options: "i" },
     });
   }
 
