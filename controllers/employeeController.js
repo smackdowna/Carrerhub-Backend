@@ -74,7 +74,7 @@ Best regards,
 MedHR Plus 🏅
     `;
 
-  // await sendEmail(email, "Verify your account", emailMessage);
+  await sendEmail(email, "Verify your account", emailMessage);
 
   res.status(201).json({
     success: true,
@@ -117,7 +117,7 @@ Best regards,
 MedHR+ 🏅
     `;
 
-  // await sendEmail(user.email, "Welcome To MedHR+", emailMessage);
+  await sendEmail(user.email, "Welcome To MedHR+", emailMessage);
 
   sendToken(user, 200, res, "Account Verified", EMPLOYEE_AUTH_TOKEN);
 });
