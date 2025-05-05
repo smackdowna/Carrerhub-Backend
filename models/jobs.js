@@ -72,6 +72,16 @@ const jobSchema = new mongoose.Schema({
       message: (props) => `${props.value} is not a valid employmentTypeCategory for ${props.instance.employmentType}`,
     },
   },
+
+  department: {
+    type: String,
+    required: true,
+  },
+  subDepartment: {
+    type: String,
+    required: true,
+  },
+
   
   employmentDuration: {
     type: Number,
