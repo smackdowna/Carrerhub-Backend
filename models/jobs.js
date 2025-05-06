@@ -100,9 +100,9 @@ const jobSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    websiteLink: {
-      type: String,
-    },
+    // websiteLink: {
+    //   type: String,
+    // },
     bio: {
       type: String,
       required: true,
