@@ -94,18 +94,15 @@ const jobSchema = new mongoose.Schema({
   companyDetails: {
     companyName: {
       type: String,
-      required: [true, "Please Enter job location !"],
     },
     industryType: {
       type: String,
-      required: true,
     },
     // websiteLink: {
     //   type: String,
     // },
     bio: {
       type: String,
-      required: true,
     },
     logo: {
       type: String,
