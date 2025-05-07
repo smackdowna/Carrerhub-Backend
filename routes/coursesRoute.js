@@ -1,15 +1,19 @@
 const express = require("express");
-const { isAuthenticatedAdmin } = require("../middleware/auth");
+const { isAuthenticatedAdmin, isAuthenticatedEmployeer } = require("../middleware/auth");
 const {
     createCourse,
     deleteCourse,
     getAllCourses,
     getCourseDetails,
     updateCourse,
+    getAllEmployerCourses,
 } = require("../controllers/courseController.js");
 const handleMultiMediaUpload = require("../middleware/mediaUpload.js");
 const router = express.Router();
-router.route("/courses/create").post(isAuthenticatedAdmin, handleMultiMediaUpload, createCourse);
+router.route("/courses/create").post(isAuthenticatedAdmin,isAuthenticatedEmployeer, handleMultiMediaUpload, createCourse);
+router
+  .route("/employeer/course")
+  .get(isAuthenticatedEmployeer, getAllEmployerCourses);
 router.route("/courses").get(getAllCourses);
 router.route("/courses/:id")
     .get(getCourseDetails)

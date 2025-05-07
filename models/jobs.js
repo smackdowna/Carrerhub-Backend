@@ -69,7 +69,8 @@ const jobSchema = new mongoose.Schema({
         }
         return false;
       },
-      message: (props) => `${props.value} is not a valid employmentTypeCategory for ${props.instance.employmentType}`,
+      message: (props) =>
+        `${props.value} is not a valid employmentTypeCategory for ${props.instance.employmentType}`,
     },
   },
 
@@ -82,15 +83,14 @@ const jobSchema = new mongoose.Schema({
     required: true,
   },
 
-  
   employmentDuration: {
     type: Number,
     required: true,
   }, // Duration in months, optional
   salary: {
     type: Number,
-    required: true,//salary range per month
-  }, // Optional 
+    required: true, //salary range per month
+  }, // Optional
   companyDetails: {
     companyName: {
       type: String,
@@ -107,7 +107,7 @@ const jobSchema = new mongoose.Schema({
     logo: {
       type: String,
     },
-  }, //we can get this from the user who created instead of asking each time
+  },
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Employeer",

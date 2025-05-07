@@ -10,6 +10,7 @@ const {
   EMPLOYEE_AUTH_TOKEN,
   ADMIN_AUTH_TOKEN,
 } = require("../constants/cookies.constant");
+const employeer = require("../models/employeer");
 
 //for employee
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {

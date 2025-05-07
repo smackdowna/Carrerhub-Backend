@@ -57,8 +57,6 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
     }
 });
 
-
-
 // Get All Courses
 exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
     const apiFeature = new ApiFeatures(
@@ -197,4 +195,28 @@ exports.updateCourse = catchAsyncErrors(async (req, res, next) => {
         success: true,
         course
     });
+});
+
+
+// Get all courses for employer
+exports.getAllEmployerCourses = catchAsyncErrors(async (req, res, next) => {
+  const resultPerPage = 15;
+  const courseCount = await Course.countDocuments({ postedBy: req.user.id });
+
+  const apiFeature = new ApiFeatures(
+    Course.find({ postedBy: req.user.id }),
+    req.query
+  )
+    .search()
+    .filter()
+    .pagination(resultPerPage);
+  const courses = await apiFeature.query;
+
+  res.status(200).json({
+    success: true,
+    courseCount,
+    courses,
+    resultPerPage,
+    filteredJobsCount: courses.length,
+  });
 });
