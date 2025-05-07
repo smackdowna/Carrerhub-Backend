@@ -39,7 +39,8 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
                 fileId: thumbnail.fileId,
                 name: thumbnail.name,
                 url: thumbnail.url
-            }
+            },
+            postedBy: req.user.id
         });
 
         // Populate the videos field for response
