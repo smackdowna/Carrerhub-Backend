@@ -17,7 +17,7 @@ router
 router.route("/courses").get(getAllCourses);
 router.route("/courses/:id")
     .get(getCourseDetails)
-    .delete(isAuthenticatedAdmin, deleteCourse)
-    .put(isAuthenticatedAdmin, handleMultiMediaUpload, updateCourse);
+    .delete(isAuthenticatedAdminOrEmployer, deleteCourse)
+    .put(isAuthenticatedAdminOrEmployer, handleMultiMediaUpload, updateCourse);
 
 module.exports = router;

@@ -8,7 +8,7 @@ router.route("/video/create").post(isAuthenticatedAdminOrEmployer, handleMultiMe
 router.route("/video/create").post(isAuthenticatedEmployeer, handleMultiMediaUpload, createVideo);
 router.route("/video/:id")
     .get(getVideo)
-    .put(isAuthenticatedAdmin, handleMultiMediaUpload, updateVideo)
-    .delete(isAuthenticatedAdmin, deleteVideo);
+    .put(isAuthenticatedAdminOrEmployer, handleMultiMediaUpload, updateVideo)
+    .delete(isAuthenticatedAdminOrEmployer, deleteVideo);
 
 module.exports = router;

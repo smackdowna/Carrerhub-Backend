@@ -37,9 +37,6 @@ exports.createVideo = catchAsyncErrors(async (req, res, next) => {
     }
 });
 
-
-
-
 exports.getVideo = catchAsyncErrors(async (req, res, next) => {
     const video = await Video.findById(req.params.id);
 
@@ -52,6 +49,7 @@ exports.getVideo = catchAsyncErrors(async (req, res, next) => {
         video
     });
 });
+
 exports.updateVideo = catchAsyncErrors(async (req, res, next) => {
     const video = await Video.findById(req.params.id);
     console.log(video);
