@@ -41,7 +41,7 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
         name: thumbnail.name,
         url: thumbnail.url,
       },
-      postedBy: req.user.id,
+      postedBy: req?.user?.id || req?.admin?.id,
     });
 
     const populatedSkill = await Skill.findById(skill._id).populate(

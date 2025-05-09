@@ -13,7 +13,6 @@ const Video = require("../models/videos.js");
 // Create Course with Videos
 exports.createCourse = catchAsyncErrors(async (req, res, next) => {
   const { name, description, videos } = req.body;
-  console.log(typeof videos, videos);
   // Basic validation
   if (!name || !description) {
     return next(new ErrorHandler("Please Enter All Fields", 400));
@@ -44,7 +43,7 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
         name: thumbnail.name,
         url: thumbnail.url,
       },
-      postedBy: req.user.id,
+      postedBy: req?.user?.id || req?.admin?.id,
     });
 
     // Populate the videos field for response
