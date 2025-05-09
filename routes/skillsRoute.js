@@ -1,13 +1,16 @@
 const express = require("express");
-const { isAuthenticatedAdmin } = require("../middleware/auth");
-const { createSkills, deleteSkill, getAllSkills, getSkillDetails, updateSkill } = require("../controllers/skillsController.js");
+const { isAuthenticatedAdmin, isAuthenticatedAdminOrEmployer, isAuthenticatedEmployeer } = require("../middleware/auth");
+const { createSkills, deleteSkill, getAllSkills, getSkillDetails, updateSkill, getAllEmployerSkillProgrammes } = require("../controllers/skillsController.js");
 const handleMultiMediaUpload = require("../middleware/mediaUpload.js");
 const router = express.Router();
 
-router.route("/skills/create").post(isAuthenticatedAdmin, handleMultiMediaUpload, createSkills);
+router.route("/skills/create").post(isAuthenticatedAdminOrEmployer, handleMultiMediaUpload, createSkills);
 router.route("/skills").get(getAllSkills);
+router
+  .route("/employeer/skill-programmes")
+  .get(isAuthenticatedEmployeer, getAllEmployerSkillProgrammes);
 router.route("/skills/:id")
     .get(getSkillDetails)
-    .delete(isAuthenticatedAdmin, deleteSkill)
-    .put(isAuthenticatedAdmin, handleMultiMediaUpload, updateSkill);
+    .delete(isAuthenticatedAdminOrEmployer, deleteSkill)
+    .put(isAuthenticatedAdminOrEmployer, handleMultiMediaUpload, updateSkill);
 module.exports = router;

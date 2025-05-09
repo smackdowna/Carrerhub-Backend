@@ -1,31 +1,29 @@
 const ErrorHandler = require("../utils/errorhandler");
 
 module.exports = (err, req, res, next) => {
+  console.error("🔥 Error:", err);
+
   err.statusCode = err.statusCode || 500;
   err.message = err.message || "Internal Server Error";
 
-  //wrong mongoDb error
   if (err.name === "CastError") {
-    const message = `Resource not Found. Invalid: ${err.path}`;
-    err = new ErrorHandler(message, 400);
+    err.message = `Resource not Found. Invalid: ${err.path}`;
+    err.statusCode = 400;
   }
 
-  //mongoose duplicate key error
   if (err.code === 11000) {
-    const message = `Duplicate ${Object.keys(err.keyValue)} Entered`;
-    err = new ErrorHandler(message, 400);
+    err.message = `Duplicate ${Object.keys(err.keyValue)} Entered`;
+    err.statusCode = 400;
   }
 
-  //wrong JWT error
   if (err.name === "JsonWebTokenError") {
-    const message = `Json web Token is invalid Try again`;
-    err = new ErrorHandler(message, 400);
+    err.message = "Json web Token is invalid. Try again";
+    err.statusCode = 400;
   }
 
-  //JWT expire
   if (err.name === "TokenExpiredError") {
-    const message = `Json web Token is Expired Try again`;
-    err = new ErrorHandler(message, 400);
+    err.message = "Json web Token is expired. Try again";
+    err.statusCode = 400;
   }
 
   res.status(err.statusCode).json({
