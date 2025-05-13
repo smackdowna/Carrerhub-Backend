@@ -18,7 +18,6 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
     programmeDescription="",
     programmeType,
     department,
-    subDepartment,
     duration,
     desiredQualificationOrExperience="",
     programmeLink="",
@@ -27,14 +26,12 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
     numberOfSeats,
     isIncludedCertificate
   } = req.body;
-  console.log({skillProgrammeName, programmeOverview, department, subDepartment, duration, desiredQualificationOrExperience, programmeLink, isPaid, fee, numberOfSeats, isIncludedCertificate});
 
   // Validate required fields
   if (
     !skillProgrammeName ||
     !programmeOverview ||
     !department ||
-    !subDepartment ||
     !duration
   ) {
     return next(new ErrorHandler("Please fill all required fields", 400));
@@ -60,7 +57,6 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
       programmeDescription,
       programmeType,
       department,
-      subDepartment,
       duration,
       desiredQualificationOrExperience,
       programmeLink,

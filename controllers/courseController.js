@@ -17,7 +17,6 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
     courseDescription = "",
     courseType,
     department,
-    subDepartment,
     duration,
     desiredQualificationOrExperience = "",
     courseLink = "",
@@ -28,7 +27,7 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
   } = req.body;
 
   // Validate required fields
-  if (!courseName || !courseOverview || !department || !subDepartment || !duration) {
+  if (!courseName || !courseOverview || !department || !duration) {
     return next(new ErrorHandler("Please fill all required fields", 400));
   }
 
@@ -53,7 +52,6 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
     courseDescription,
     courseType,
     department,
-    subDepartment,
     duration,
     desiredQualificationOrExperience,
     courseLink,

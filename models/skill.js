@@ -16,15 +16,11 @@ const skillSchema = new mongoose.Schema(
     },
     programmeType: {
       type: String,
-      enum: ["Certificate", "Diploma", "Bachelor", "Master"],
+      enum: ["Offline", "Online", "Fellowship", "Scholarships", "Events"],
     },
     department: {
       type: String,
       required: [true, "Please Enter Programme Department Name"],
-    },
-    subDepartment: {
-      type: String,
-      required: [true, "Please Enter Programme Sub-Department Name"],
     },
     duration: {
       type: String,

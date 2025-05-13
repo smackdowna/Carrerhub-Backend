@@ -23,10 +23,6 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please Enter Course Department Name"],
     },
-    subDepartment: {
-      type: String,
-      required: [true, "Please Enter Course Sub-Department Name"],
-    },
     duration: {
       type: String,
       required: [true, "Please Enter Course Duration"],
