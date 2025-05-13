@@ -3,23 +3,54 @@ const { FileSchema } = require("./file.js");
 
 const skillSchema = new mongoose.Schema(
   {
-    name: {
+    skillProgrammeName: {
       type: String,
-      required: [true, "Please Enter Your Skill Name"],
-      unique: true,
+      required: [true, "Please Enter Your Skill Programme Name"],
     },
-    description: {
+    programmeOverview: {
       type: String,
-      required: [true, "Please Enter Your Skill Description"],
+      required: [true, "Please Enter Your Programme Overview"],
     },
-    skillCovered: {
+    programmeDescription: {
       type: String,
-      required: [true, "Please Enter Your Skill Covered"],
     },
-    video: {
-      // Single video reference
-      type: mongoose.Schema.ObjectId,
-      ref: "Video",
+    programmeType: {
+      type: String,
+      enum: ["Certificate", "Diploma", "Bachelor", "Master"],
+    },
+    department: {
+      type: String,
+      required: [true, "Please Enter Programme Department Name"],
+    },
+    subDepartment: {
+      type: String,
+      required: [true, "Please Enter Programme Sub-Department Name"],
+    },
+    duration: {
+      type: String,
+      required: [true, "Please Enter Programme Duration"],
+    },
+    desiredQualificationOrExperience: {
+      type: String,
+    },
+    programmeLink: {
+      type: String,
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
+    fee: {
+      type: Number,
+      default: 0,
+    },
+    numberOfSeats: {
+      type: Number,
+      default: 0,
+    },
+    isIncludedCertificate: {
+      type: Boolean,
+      default: false,
     },
     thumbnail: FileSchema,
     postedBy: {

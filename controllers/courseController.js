@@ -10,57 +10,72 @@ const {
 const getDataUri = require("../utils/dataUri.js");
 const Video = require("../models/videos.js");
 
-// Create Course with Videos
 exports.createCourse = catchAsyncErrors(async (req, res, next) => {
-  const { name, description, videos } = req.body;
-  // Basic validation
-  if (!name || !description) {
-    return next(new ErrorHandler("Please Enter All Fields", 400));
+  const {
+    courseName,
+    courseOverview,
+    courseDescription = "",
+    courseType,
+    department,
+    subDepartment,
+    duration,
+    desiredQualificationOrExperience = "",
+    courseLink = "",
+    isPaid = false,
+    fee = 0,
+    numberOfSeats = 0,
+    isIncludedCertificate = false,
+  } = req.body;
+
+  // Validate required fields
+  if (!courseName || !courseOverview || !department || !subDepartment || !duration) {
+    return next(new ErrorHandler("Please fill all required fields", 400));
   }
 
   // Validate thumbnail upload
   const thumbnailFile = req.files?.image?.[0];
   if (!thumbnailFile) {
-    return next(new ErrorHandler("Please Upload a Thumbnail", 400));
+    return next(new ErrorHandler("Please upload a thumbnail", 400));
   }
 
-  try {
-    // Handle thumbnail upload
-    const thumbnailUri = getDataUri(thumbnailFile);
-    const thumbnail = await uploadFile(
-      thumbnailUri.content,
-      thumbnailUri.fileName,
-      "course-thumbnails"
-    );
+  // Upload thumbnail
+  const thumbnailUri = getDataUri(thumbnailFile);
+  const thumbnail = await uploadFile(
+    thumbnailUri.content,
+    thumbnailUri.fileName,
+    "course-thumbnails"
+  );
 
-    // Create course with validated data
-    const course = await Course.create({
-      name,
-      description,
-      videos, // Expecting an array of video IDs
-      thumbnail: {
-        fileId: thumbnail.fileId,
-        name: thumbnail.name,
-        url: thumbnail.url,
-      },
-      postedBy: req?.user?.id || req?.admin?.id,
-    });
+  // Create the course
+  const course = await Course.create({
+    courseName,
+    courseOverview,
+    courseDescription,
+    courseType,
+    department,
+    subDepartment,
+    duration,
+    desiredQualificationOrExperience,
+    courseLink,
+    isPaid,
+    fee,
+    numberOfSeats,
+    isIncludedCertificate,
+    thumbnail: {
+      fileId: thumbnail.fileId,
+      name: thumbnail.name,
+      url: thumbnail.url,
+    },
+    postedBy: req?.user?.id || req?.admin?.id,
+  });
 
-    // Populate the videos field for response
-    const populatedCourse = await Course.findById(course._id).populate(
-      "videos",
-      "name title url createdAt"
-    ); // Populate the videos field
-
-    res.status(201).json({
-      success: true,
-      course: populatedCourse,
-      message: "Course created successfully",
-    });
-  } catch (error) {
-    return next(new ErrorHandler(error.message, 500));
-  }
+  res.status(201).json({
+    success: true,
+    course,
+    message: "Course created successfully",
+  });
 });
+
 
 // Get All Courses
 exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {

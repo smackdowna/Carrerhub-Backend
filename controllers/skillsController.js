@@ -12,12 +12,35 @@ const Video = require("../models/videos.js");
 
 // Create Skill with Videos
 exports.createSkills = catchAsyncErrors(async (req, res, next) => {
-  const { name, description, skillCovered, videoId } = req.body;
+  const {
+    skillProgrammeName,
+    programmeOverview,
+    programmeDescription="",
+    programmeType,
+    department,
+    subDepartment,
+    duration,
+    desiredQualificationOrExperience="",
+    programmeLink="",
+    isPaid,
+    fee,
+    numberOfSeats,
+    isIncludedCertificate
+  } = req.body;
+  console.log({skillProgrammeName, programmeOverview, department, subDepartment, duration, desiredQualificationOrExperience, programmeLink, isPaid, fee, numberOfSeats, isIncludedCertificate});
 
-  if (!name || !description || !skillCovered || !videoId) {
-    return next(new ErrorHandler("Please Enter All Fields", 400));
+  // Validate required fields
+  if (
+    !skillProgrammeName ||
+    !programmeOverview ||
+    !department ||
+    !subDepartment ||
+    !duration
+  ) {
+    return next(new ErrorHandler("Please fill all required fields", 400));
   }
 
+  // Check for thumbnail image
   const thumbnailFile = req.files?.image?.[0];
   if (!thumbnailFile) {
     return next(new ErrorHandler("Please Upload a Thumbnail", 400));
@@ -32,10 +55,19 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
     );
 
     const skill = await Skill.create({
-      name,
-      description,
-      skillCovered,
-      video: videoId,
+      skillProgrammeName,
+      programmeOverview,
+      programmeDescription,
+      programmeType,
+      department,
+      subDepartment,
+      duration,
+      desiredQualificationOrExperience,
+      programmeLink,
+      isPaid,
+      fee,
+      numberOfSeats,
+      isIncludedCertificate,
       thumbnail: {
         fileId: thumbnail.fileId,
         name: thumbnail.name,
@@ -44,20 +76,16 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
       postedBy: req?.user?.id || req?.admin?.id,
     });
 
-    const populatedSkill = await Skill.findById(skill._id).populate(
-      "video",
-      "name url createdAt title"
-    );
-
     res.status(201).json({
       success: true,
-      skill: populatedSkill,
-      message: "Skill created successfully",
+      skill,
+      message: "Skill Programme created successfully",
     });
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
 
 // Update Skill
 exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
