@@ -145,8 +145,29 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Other controller methods remain the same...
-exports.getAllSkills = catchAsyncErrors(async (req, res, next) => {
-  const skills = await Skill.find();
+exports.getAllSkills = catchAsyncErrors(async (req, res) => {
+  const { keyword, programmeType, department, pricingType } = req.query;
+
+  const filter = {};
+
+  // Filter by programmeType
+  if (programmeType) {
+    filter.programmeType = programmeType;
+  }
+
+  // Filter by department
+  if (department) {
+    filter.department = department;
+  }
+
+  // Filter by pricingType
+  if (pricingType) {
+    filter.pricingType = pricingType;
+  }
+
+  // Search by courseName
+  if (keyword) filter.skillProgrammeName = { $regex: keyword, $options: "i" };
+  const skills = await Skill.find(filter);
 
   res.status(200).json({
     success: true,

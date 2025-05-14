@@ -78,7 +78,6 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
 // Get All Courses
 exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
   const { keyword, courseType, department, pricingType } = req.query;
-  console.log(req.query, "KEYWORD");
 
   const filter = {};
 
