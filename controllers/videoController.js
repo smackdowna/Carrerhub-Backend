@@ -107,7 +107,7 @@ exports.deleteVideo = catchAsyncErrors(async (req, res, next) => {
     await deleteFile(video.fileId);
   }
 
-  await video.remove();
+  await video.deleteOne();
 
   res.status(200).json({
     success: true,

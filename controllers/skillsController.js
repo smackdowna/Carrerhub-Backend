@@ -12,12 +12,32 @@ const Video = require("../models/videos.js");
 
 // Create Skill with Videos
 exports.createSkills = catchAsyncErrors(async (req, res, next) => {
-  const { name, description, skillCovered, videoId } = req.body;
+  const {
+    skillProgrammeName,
+    programmeOverview,
+    programmeDescription="",
+    programmeType,
+    department,
+    duration,
+    desiredQualificationOrExperience="",
+    programmeLink="",
+    pricingType="Free",
+    fee,
+    numberOfSeats,
+    isIncludedCertificate
+  } = req.body;
 
-  if (!name || !description || !skillCovered || !videoId) {
-    return next(new ErrorHandler("Please Enter All Fields", 400));
+  // Validate required fields
+  if (
+    !skillProgrammeName ||
+    !programmeOverview ||
+    !department ||
+    !duration
+  ) {
+    return next(new ErrorHandler("Please fill all required fields", 400));
   }
 
+  // Check for thumbnail image
   const thumbnailFile = req.files?.image?.[0];
   if (!thumbnailFile) {
     return next(new ErrorHandler("Please Upload a Thumbnail", 400));
@@ -32,32 +52,36 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
     );
 
     const skill = await Skill.create({
-      name,
-      description,
-      skillCovered,
-      video: videoId,
+      skillProgrammeName,
+      programmeOverview,
+      programmeDescription,
+      programmeType,
+      department,
+      duration,
+      desiredQualificationOrExperience,
+      programmeLink,
+      pricingType,
+      fee,
+      numberOfSeats,
+      isIncludedCertificate,
       thumbnail: {
         fileId: thumbnail.fileId,
         name: thumbnail.name,
         url: thumbnail.url,
       },
-      postedBy: req.user.id,
+      postedBy: req?.user?.id || req?.admin?.id,
     });
-
-    const populatedSkill = await Skill.findById(skill._id).populate(
-      "video",
-      "name url createdAt title"
-    );
 
     res.status(201).json({
       success: true,
-      skill: populatedSkill,
-      message: "Skill created successfully",
+      skill,
+      message: "Skill Programme created successfully",
     });
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
 
 // Update Skill
 exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
@@ -122,14 +146,7 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
 
 // Other controller methods remain the same...
 exports.getAllSkills = catchAsyncErrors(async (req, res, next) => {
-  const apiFeature = new ApiFeatures(
-    Skill.find().populate("video", "name url title createdAt"), // Changed from videos to video
-    req.query
-  )
-    .search()
-    .filter();
-
-  const skills = await apiFeature.query;
+  const skills = await Skill.find();
 
   res.status(200).json({
     success: true,
@@ -138,10 +155,7 @@ exports.getAllSkills = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getSkillDetails = catchAsyncErrors(async (req, res, next) => {
-  const skill = await Skill.findById(req.params.id).populate(
-    "video",
-    "name url title createdAt"
-  ); // Changed from videos to video
+  const skill = await Skill.findById(req.params.id).populate("postedBy");
 
   if (!skill) {
     return next(new ErrorHandler("Skill not found", 404));

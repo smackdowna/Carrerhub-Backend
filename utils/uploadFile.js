@@ -35,15 +35,20 @@ const uploadFile = (file, fileName, folder) => {
  */
 const deleteFile = (fileId) => {
   return new Promise((resolve, reject) => {
+    console.log("Trying to delete file with ID:", fileId);
     imageKit.deleteFile(fileId, (err, result) => {
       if (err) {
+        console.error("Error deleting file:", err);
         return reject(err.message);
       } else {
+        console.log("File deleted successfully:", result);
         return resolve(result);
       }
     });
   });
 };
+
+
 /**
  * Deletes multiple files in bulk using their file IDs.
  *
