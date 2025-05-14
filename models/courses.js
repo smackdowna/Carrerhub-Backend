@@ -33,9 +33,9 @@ const courseSchema = new mongoose.Schema(
     courseLink: {
       type: String,
     },
-    isPaid: {
-      type: Boolean,
-      default: false,
+    pricingType: {
+      type: String,
+      default: "Free",
     },
     fee: {
       type: Number,

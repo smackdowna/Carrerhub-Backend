@@ -21,7 +21,7 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
     duration,
     desiredQualificationOrExperience="",
     programmeLink="",
-    isPaid,
+    pricingType="Free",
     fee,
     numberOfSeats,
     isIncludedCertificate
@@ -60,7 +60,7 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
       duration,
       desiredQualificationOrExperience,
       programmeLink,
-      isPaid,
+      pricingType,
       fee,
       numberOfSeats,
       isIncludedCertificate,

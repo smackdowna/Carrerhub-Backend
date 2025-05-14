@@ -32,9 +32,9 @@ const skillSchema = new mongoose.Schema(
     programmeLink: {
       type: String,
     },
-    isPaid: {
-      type: Boolean,
-      default: false,
+    pricingType: {
+      type: String,
+      default: "Free",
     },
     fee: {
       type: Number,

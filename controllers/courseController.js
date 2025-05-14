@@ -20,7 +20,7 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
     duration,
     desiredQualificationOrExperience = "",
     courseLink = "",
-    isPaid = false,
+    pricingType = "Free",
     fee = 0,
     numberOfSeats = 0,
     isIncludedCertificate = false,
@@ -55,7 +55,7 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
     duration,
     desiredQualificationOrExperience,
     courseLink,
-    isPaid,
+    pricingType,
     fee,
     numberOfSeats,
     isIncludedCertificate,
@@ -77,17 +77,8 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
 
 // Get All Courses
 exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
-  const apiFeature = new ApiFeatures(
-    Course.find().populate({
-      path: "videos",
-      select: "name url title createdAt",
-    }),
-    req.query
-  )
-    .search()
-    .filter();
 
-  const courses = await apiFeature.query;
+  const courses = await Course.find();
 
   res.status(200).json({
     success: true,
