@@ -146,14 +146,7 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
 
 // Other controller methods remain the same...
 exports.getAllSkills = catchAsyncErrors(async (req, res, next) => {
-  const apiFeature = new ApiFeatures(
-    Skill.find().populate("video", "name url title createdAt"), // Changed from videos to video
-    req.query
-  )
-    .search()
-    .filter();
-
-  const skills = await apiFeature.query;
+  const skills = await Skill.find();
 
   res.status(200).json({
     success: true,
@@ -162,10 +155,7 @@ exports.getAllSkills = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getSkillDetails = catchAsyncErrors(async (req, res, next) => {
-  const skill = await Skill.findById(req.params.id).populate(
-    "video",
-    "name url title createdAt"
-  ); // Changed from videos to video
+  const skill = await Skill.findById(req.params.id).populate("postedBy");
 
   if (!skill) {
     return next(new ErrorHandler("Skill not found", 404));

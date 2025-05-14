@@ -77,8 +77,30 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
 
 // Get All Courses
 exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
+  const { keyword, courseType, department, pricingType } = req.query;
+  console.log(req.query, "KEYWORD");
 
-  const courses = await Course.find();
+  const filter = {};
+
+  // Filter by courseType
+  if (courseType) {
+    filter.courseType = courseType;
+  }
+
+  // Filter by department
+  if (department) {
+    filter.department = department;
+  }
+
+  // Filter by pricingType
+  if (pricingType) {
+    filter.pricingType = pricingType;
+  }
+
+  // Search by courseName
+  if (keyword) filter.courseName = { $regex: keyword, $options: "i" };
+
+  const courses = await Course.find(filter);
 
   res.status(200).json({
     success: true,
@@ -86,16 +108,14 @@ exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+
 // Get Course Details
 exports.getCourseDetails = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   if (!id) {
     return next(new ErrorHandler("Course ID is required", 400));
   }
-  const course = await Course.findById(id).populate({
-    path: "videos",
-    select: "name url title createdAt",
-  });
+  const course = await Course.findById(id).populate("postedBy");
 
   if (!course) {
     return next(new ErrorHandler("Course not found", 404));
