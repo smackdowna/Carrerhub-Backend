@@ -86,14 +86,30 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
 // Update Skill
 exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
-  const { name, description, skillCovered, videoId } = req.body;
+
+  const {
+    name,
+    description,
+    skillProgrammeName,
+    programmeOverview,
+    programmeDescription,
+    programmeType,
+    department,
+    duration,
+    desiredQualificationOrExperience,
+    programmeLink,
+    pricingType,
+    fee,
+    numberOfSeats,
+    isIncludedCertificate,
+  } = req.body;
 
   const skill = await Skill.findById(id);
   if (!skill) {
     return next(new ErrorHandler("Skill not found", 404));
   }
 
-  // 🔐 Authorization Check: Only admin or owner (employer) can update
+  // 🔐 Authorization Check
   const isAdmin = req.admin;
   const isOwner =
     req.user && skill.postedBy.toString() === req.user._id.toString();
@@ -107,8 +123,19 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
   // 🛠️ Update fields
   if (name) skill.name = name;
   if (description) skill.description = description;
-  if (skillCovered) skill.skillCovered = skillCovered;
-  if (videoId) skill.video = videoId;
+
+  if (skillProgrammeName) skill.skillProgrammeName = skillProgrammeName;
+  if (programmeOverview) skill.programmeOverview = programmeOverview;
+  if (programmeDescription) skill.programmeDescription = programmeDescription;
+  if (programmeType) skill.programmeType = programmeType;
+  if (department) skill.department = department;
+  if (duration) skill.duration = duration;
+  if (desiredQualificationOrExperience) skill.desiredQualificationOrExperience = desiredQualificationOrExperience;
+  if (programmeLink) skill.programmeLink = programmeLink;
+  if (pricingType) skill.pricingType = pricingType;
+  if (typeof fee !== "undefined") skill.fee = fee;
+  if (typeof numberOfSeats !== "undefined") skill.numberOfSeats = numberOfSeats;
+  if (typeof isIncludedCertificate !== "undefined") skill.isIncludedCertificate = isIncludedCertificate;
 
   // 🖼️ Thumbnail upload handling
   const thumbnailFile = req.files?.image?.[0];
@@ -133,16 +160,12 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
 
   await skill.save();
 
-  const populatedSkill = await Skill.findById(skill._id).populate(
-    "video",
-    "name url createdAt title"
-  );
-
   res.status(200).json({
     success: true,
-    skill: populatedSkill,
+    skill,
   });
 });
+
 
 // Other controller methods remain the same...
 exports.getAllSkills = catchAsyncErrors(async (req, res) => {
