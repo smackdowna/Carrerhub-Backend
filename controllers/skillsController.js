@@ -245,7 +245,7 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Skill ID is required", 400));
   }
 
-  const skill = await Skill.findById(id).populate("video");
+  const skill = await Skill.findById(id);
 
   if (!skill) {
     return next(new ErrorHandler("Skill not found", 404));
@@ -253,8 +253,7 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
 
   // 🔐 Authorization: allow if admin OR posting employer
   const isAdmin = req.admin;
-  const isOwner =
-    req.user && skill.postedBy.toString() === req.user._id.toString();
+  const isOwner = req.user && skill.postedBy.toString() === req.user._id.toString();
 
   if (!isAdmin && !isOwner) {
     return next(
@@ -264,15 +263,9 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
 
   // 🗑️ Gather file IDs for deletion
   const fileIdsToDelete = [];
-  const videoIdsToDelete = [];
 
   if (skill.thumbnail) {
     fileIdsToDelete.push(skill.thumbnail.fileId);
-  }
-
-  if (skill.video) {
-    fileIdsToDelete.push(skill.video.fileId);
-    videoIdsToDelete.push(skill.video._id);
   }
 
   if (fileIdsToDelete.length > 0) {
@@ -282,10 +275,6 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
       console.log(error);
       return next(new ErrorHandler("Failed to delete files", 500));
     }
-  }
-
-  if (videoIdsToDelete.length > 0) {
-    await Video.deleteMany({ _id: { $in: videoIdsToDelete } });
   }
 
   await skill.deleteOne();
