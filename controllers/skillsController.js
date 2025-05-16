@@ -86,14 +86,30 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
 // Update Skill
 exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
-  const { name, description, skillCovered, videoId } = req.body;
+
+  const {
+    name,
+    description,
+    skillProgrammeName,
+    programmeOverview,
+    programmeDescription,
+    programmeType,
+    department,
+    duration,
+    desiredQualificationOrExperience,
+    programmeLink,
+    pricingType,
+    fee,
+    numberOfSeats,
+    isIncludedCertificate,
+  } = req.body;
 
   const skill = await Skill.findById(id);
   if (!skill) {
     return next(new ErrorHandler("Skill not found", 404));
   }
 
-  // 🔐 Authorization Check: Only admin or owner (employer) can update
+  // 🔐 Authorization Check
   const isAdmin = req.admin;
   const isOwner =
     req.user && skill.postedBy.toString() === req.user._id.toString();
@@ -107,8 +123,19 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
   // 🛠️ Update fields
   if (name) skill.name = name;
   if (description) skill.description = description;
-  if (skillCovered) skill.skillCovered = skillCovered;
-  if (videoId) skill.video = videoId;
+
+  if (skillProgrammeName) skill.skillProgrammeName = skillProgrammeName;
+  if (programmeOverview) skill.programmeOverview = programmeOverview;
+  if (programmeDescription) skill.programmeDescription = programmeDescription;
+  if (programmeType) skill.programmeType = programmeType;
+  if (department) skill.department = department;
+  if (duration) skill.duration = duration;
+  if (desiredQualificationOrExperience) skill.desiredQualificationOrExperience = desiredQualificationOrExperience;
+  if (programmeLink) skill.programmeLink = programmeLink;
+  if (pricingType) skill.pricingType = pricingType;
+  if (typeof fee !== "undefined") skill.fee = fee;
+  if (typeof numberOfSeats !== "undefined") skill.numberOfSeats = numberOfSeats;
+  if (typeof isIncludedCertificate !== "undefined") skill.isIncludedCertificate = isIncludedCertificate;
 
   // 🖼️ Thumbnail upload handling
   const thumbnailFile = req.files?.image?.[0];
@@ -133,20 +160,37 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
 
   await skill.save();
 
-  const populatedSkill = await Skill.findById(skill._id).populate(
-    "video",
-    "name url createdAt title"
-  );
-
   res.status(200).json({
     success: true,
-    skill: populatedSkill,
+    skill,
   });
 });
 
+
 // Other controller methods remain the same...
-exports.getAllSkills = catchAsyncErrors(async (req, res, next) => {
-  const skills = await Skill.find();
+exports.getAllSkills = catchAsyncErrors(async (req, res) => {
+  const { keyword, programmeType, department, pricingType } = req.query;
+
+  const filter = {};
+
+  // Filter by programmeType
+  if (programmeType) {
+    filter.programmeType = programmeType;
+  }
+
+  // Filter by department
+  if (department) {
+    filter.department = department;
+  }
+
+  // Filter by pricingType
+  if (pricingType) {
+    filter.pricingType = pricingType;
+  }
+
+  // Search by courseName
+  if (keyword) filter.skillProgrammeName = { $regex: keyword, $options: "i" };
+  const skills = await Skill.find(filter).populate("postedBy");
 
   res.status(200).json({
     success: true,
@@ -201,7 +245,7 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Skill ID is required", 400));
   }
 
-  const skill = await Skill.findById(id).populate("video");
+  const skill = await Skill.findById(id);
 
   if (!skill) {
     return next(new ErrorHandler("Skill not found", 404));
@@ -209,8 +253,7 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
 
   // 🔐 Authorization: allow if admin OR posting employer
   const isAdmin = req.admin;
-  const isOwner =
-    req.user && skill.postedBy.toString() === req.user._id.toString();
+  const isOwner = req.user && skill.postedBy.toString() === req.user._id.toString();
 
   if (!isAdmin && !isOwner) {
     return next(
@@ -220,15 +263,9 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
 
   // 🗑️ Gather file IDs for deletion
   const fileIdsToDelete = [];
-  const videoIdsToDelete = [];
 
   if (skill.thumbnail) {
     fileIdsToDelete.push(skill.thumbnail.fileId);
-  }
-
-  if (skill.video) {
-    fileIdsToDelete.push(skill.video.fileId);
-    videoIdsToDelete.push(skill.video._id);
   }
 
   if (fileIdsToDelete.length > 0) {
@@ -238,10 +275,6 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
       console.log(error);
       return next(new ErrorHandler("Failed to delete files", 500));
     }
-  }
-
-  if (videoIdsToDelete.length > 0) {
-    await Video.deleteMany({ _id: { $in: videoIdsToDelete } });
   }
 
   await skill.deleteOne();

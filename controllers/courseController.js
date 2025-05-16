@@ -78,7 +78,6 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
 // Get All Courses
 exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
   const { keyword, courseType, department, pricingType } = req.query;
-  console.log(req.query, "KEYWORD");
 
   const filter = {};
 
@@ -100,7 +99,7 @@ exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
   // Search by courseName
   if (keyword) filter.courseName = { $regex: keyword, $options: "i" };
 
-  const courses = await Course.find(filter);
+  const courses = await Course.find(filter).populate("postedBy");
 
   res.status(200).json({
     success: true,
@@ -135,7 +134,7 @@ exports.deleteCourse = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Course ID is required", 400));
   }
 
-  const course = await Course.findById(id).populate("videos");
+  const course = await Course.findById(id);
 
   if (!course) {
     return next(new ErrorHandler("Course not found", 404));
@@ -143,8 +142,7 @@ exports.deleteCourse = catchAsyncErrors(async (req, res, next) => {
 
   // 🔐 Authorization Check
   const isAdmin = req.admin;
-  const isOwner =
-    req.user && course.postedBy.toString() === req.user._id.toString();
+  const isOwner = req.user && course.postedBy.toString() === req.user._id.toString();
 
   if (!isAdmin && !isOwner) {
     return next(
@@ -159,14 +157,6 @@ exports.deleteCourse = catchAsyncErrors(async (req, res, next) => {
     fileIdsToDelete.push(course.thumbnail.fileId);
   }
 
-  const videoIdsToDelete = [];
-  if (course.videos && course.videos.length > 0) {
-    course.videos.forEach((video) => {
-      fileIdsToDelete.push(video.fileId);
-      videoIdsToDelete.push(video._id);
-    });
-  }
-
   // 🗑️ Delete files and videos
   if (fileIdsToDelete.length > 0) {
     try {
@@ -175,10 +165,6 @@ exports.deleteCourse = catchAsyncErrors(async (req, res, next) => {
       console.log(error);
       return next(new ErrorHandler("Failed to delete files", 500));
     }
-  }
-
-  if (videoIdsToDelete.length > 0) {
-    await Video.deleteMany({ _id: { $in: videoIdsToDelete } });
   }
 
   await course.deleteOne();
@@ -196,7 +182,22 @@ exports.updateCourse = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Course ID is required", 400));
   }
 
-  const { name, description, videos } = req.body;
+  const {
+    name,
+    description,
+    courseName,
+    courseOverview,
+    courseDescription,
+    courseType,
+    department,
+    duration,
+    desiredQualificationOrExperience,
+    courseLink,
+    pricingType,
+    fee,
+    numberOfSeats,
+    isIncludedCertificate,
+  } = req.body;
 
   const course = await Course.findById(id);
   if (!course) {
@@ -217,18 +218,20 @@ exports.updateCourse = catchAsyncErrors(async (req, res, next) => {
   // 🛠️ Update fields
   if (name) course.name = name;
   if (description) course.description = description;
-
-  if (videos) {
-    const validExistingVideos = [];
-    for (const videoId of course.videos) {
-      const videoExists = await Video.exists({ _id: videoId });
-      if (videoExists) {
-        validExistingVideos.push(videoId);
-      }
-    }
-
-    course.videos = [...validExistingVideos, ...videos];
-  }
+  if (courseName) course.courseName = courseName;
+  if (courseOverview) course.courseOverview = courseOverview;
+  if (courseDescription) course.courseDescription = courseDescription;
+  if (courseType) course.courseType = courseType;
+  if (department) course.department = department;
+  if (duration) course.duration = duration;
+  if (desiredQualificationOrExperience)
+    course.desiredQualificationOrExperience = desiredQualificationOrExperience;
+  if (courseLink) course.courseLink = courseLink;
+  if (pricingType) course.pricingType = pricingType;
+  if (fee !== undefined) course.fee = fee;
+  if (numberOfSeats !== undefined) course.numberOfSeats = numberOfSeats;
+  if (isIncludedCertificate !== undefined)
+    course.isIncludedCertificate = isIncludedCertificate;
 
   // 🖼️ Thumbnail Upload
   const thumbnailFile = req.files?.image?.[0];
@@ -259,6 +262,7 @@ exports.updateCourse = catchAsyncErrors(async (req, res, next) => {
     course,
   });
 });
+
 
 // Get all courses for employer
 exports.getAllEmployerCourses = catchAsyncErrors(async (req, res, next) => {
