@@ -190,7 +190,7 @@ exports.getAllSkills = catchAsyncErrors(async (req, res) => {
 
   // Search by courseName
   if (keyword) filter.skillProgrammeName = { $regex: keyword, $options: "i" };
-  const skills = await Skill.find(filter);
+  const skills = await Skill.find(filter).populate("postedBy");
 
   res.status(200).json({
     success: true,
