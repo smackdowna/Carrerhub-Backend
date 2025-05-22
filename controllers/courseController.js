@@ -309,7 +309,7 @@ exports.applyOnCourse = catchAsyncErrors(async (req, res, next) => {
       (applicant) => applicant.employee.toString() === userId
     )
   ) {
-    return next(new ErrorHandler("You have already applied for the job", 404));
+    return next(new ErrorHandler("You have already applied for this course", 404));
   }
 
   // Add the user's ID to the applicants array
@@ -324,7 +324,7 @@ exports.applyOnCourse = catchAsyncErrors(async (req, res, next) => {
 
 Thank you for choosing MedHr Plus! 🏆
 
-You Have Successfully Applied for ${course.title}
+You Have Successfully Applied for ${course.courseName}
 Please visit this link for further details about this course: ${course?.courseLink}
 
 Thank you for your trust in MedHr Plus.
@@ -337,7 +337,7 @@ MedHr Plus 🏅
   await sendEmail(user.email, "Successfully Applied for Course", emailMessage);
 
   const emailMessageForEmployer = `
-You Have Received a New Application  for ${course.title}
+You Have Received a New Application  for ${course.courseName}
 
 Thank you for your trust in MedHr Plus.
 
@@ -348,7 +348,7 @@ MedHr Plus 🏅
 
   const emailMessageForAdmin = `Dear Admin,
 
-We have received a new course application from **${user.full_name}** for the course titled **"${course.title}"**.
+We have received a new course application from **${user.full_name}** for the course titled **"${course.courseName}"**.
 
 Please log in to your dashboard to review the application details.
 
