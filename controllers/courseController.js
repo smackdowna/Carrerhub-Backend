@@ -309,7 +309,7 @@ exports.applyOnCourse = catchAsyncErrors(async (req, res, next) => {
       (applicant) => applicant.employee.toString() === userId
     )
   ) {
-    return next(new ErrorHandler("You have already applied for this course", 404));
+    return next(new ErrorHandler("You have already applied for this course", 500));
   }
 
   // Add the user's ID to the applicants array

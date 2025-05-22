@@ -17,9 +17,9 @@ const eventSchema = new mongoose.Schema({
   time: { type: String, required: true },
   company: { type: companySchema, required: true },
   skillCovered: { type: [String], required: true },
-  createdBy: {
+  postedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Admin",
+    ref: "Employeer",
     required: true,
   },
 });

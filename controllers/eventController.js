@@ -37,17 +37,17 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
         name: uploadedImage.name,
         url: uploadedImage.url,
       },
-      createdBy: req.admin._id,
+      postedBy: req?.user?.id || req?.admin?.id,
     });
 
-    const populatedEvent = await Event.findById(event._id).populate(
-      "createdBy",
-      "full_name email"
-    );
+    // const populatedEvent = await Event.findById(event?._id).populate(
+    //   "postedBy",
+    //   "full_name email"
+    // );
 
     res.status(201).json({
       success: true,
-      event: populatedEvent,
+      event: event,
       message: "Event created successfully",
     });
   } catch (error) {
@@ -55,12 +55,35 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-// Get all events
+// Get all events for admin
 exports.getAllEvents = catchAsyncErrors(async (req, res, next) => {
   const events = await Event.find().populate("createdBy", "full_name email");
   res.status(200).json({
     success: true,
     data: events,
+  });
+});
+
+// Get all courses for employer
+exports.getAllEmployerEvents = catchAsyncErrors(async (req, res, next) => {
+  const resultPerPage = 15;
+  const courseCount = await Event.countDocuments({ postedBy: req.user.id });
+
+  const apiFeature = new ApiFeatures(
+    Event.find({ postedBy: req.user.id }),
+    req.query
+  )
+    .search()
+    .filter()
+    .pagination(resultPerPage);
+  const events = await apiFeature.query;
+
+  res.status(200).json({
+    success: true,
+    courseCount,
+    events,
+    resultPerPage,
+    filteredJobsCount: events.length,
   });
 });
 
@@ -92,6 +115,17 @@ exports.updateEvent = catchAsyncErrors(async (req, res, next) => {
 
   if (!event) {
     return next(new ErrorHandler("Event not found", 404));
+  }
+
+  // 🔐 Authorization Check
+  const isAdmin = req.admin;
+  const isOwner =
+    req.user && event.postedBy.toString() === req.user._id.toString();
+
+  if (!isAdmin && !isOwner) {
+    return next(
+      new ErrorHandler("You are not authorized to update this event", 403)
+    );
   }
 
   // Update simple fields
@@ -170,6 +204,17 @@ exports.deleteEvent = catchAsyncErrors(async (req, res, next) => {
 
   if (!event) {
     return next(new ErrorHandler("Event not found", 404));
+  }
+
+  // 🔐 Authorization Check
+  const isAdmin = req.admin;
+  const isOwner =
+    req.user && event.postedBy.toString() === req.user._id.toString();
+
+  if (!isAdmin && !isOwner) {
+    return next(
+      new ErrorHandler("You are not authorized to update this event", 403)
+    );
   }
 
   await event.deleteOne();
