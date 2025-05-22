@@ -8,7 +8,7 @@ const {
   deleteFile,
 } = require("../utils/uploadFile.js");
 const getDataUri = require("../utils/dataUri.js");
-const Video = require("../models/videos.js");
+const sendEmail = require("../utils/sendEmail.js");
 
 exports.createCourse = catchAsyncErrors(async (req, res, next) => {
   const {
@@ -74,7 +74,6 @@ exports.createCourse = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 // Get All Courses
 exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
   const { keyword, courseType, department, pricingType } = req.query;
@@ -106,7 +105,6 @@ exports.getAllCourses = catchAsyncErrors(async (req, res, next) => {
     courses,
   });
 });
-
 
 // Get Course Details
 exports.getCourseDetails = catchAsyncErrors(async (req, res, next) => {
@@ -142,7 +140,8 @@ exports.deleteCourse = catchAsyncErrors(async (req, res, next) => {
 
   // 🔐 Authorization Check
   const isAdmin = req.admin;
-  const isOwner = req.user && course.postedBy.toString() === req.user._id.toString();
+  const isOwner =
+    req.user && course.postedBy.toString() === req.user._id.toString();
 
   if (!isAdmin && !isOwner) {
     return next(
@@ -263,7 +262,6 @@ exports.updateCourse = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 // Get all courses for employer
 exports.getAllEmployerCourses = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
@@ -284,5 +282,95 @@ exports.getAllEmployerCourses = catchAsyncErrors(async (req, res, next) => {
     courses,
     resultPerPage,
     filteredJobsCount: courses.length,
+  });
+});
+
+// Apply on course
+exports.applyOnCourse = catchAsyncErrors(async (req, res, next) => {
+  const course = await Course.findById(req.params.id).populate(
+    "postedBy",
+    "name email"
+  );
+
+  console.log(course);
+
+  const employer = course.postedBy.email;
+
+  const userId = req.user.id;
+  const user = req.user;
+
+  if (!course) {
+    return next(new ErrorHandler("Course not found", 404));
+  }
+
+  // Check if the user has already applied
+  if (
+    course.applicants.find(
+      (applicant) => applicant.employee.toString() === userId
+    )
+  ) {
+    return next(new ErrorHandler("You have already applied for the job", 404));
+  }
+
+  // Add the user's ID to the applicants array
+  course.applicants.push({
+    employee: userId,
+  });
+
+  // Save the job document
+  await course.save();
+
+  const emailMessage = `Dear ${user?.full_name},
+
+Thank you for choosing MedHr Plus! 🏆
+
+You Have Successfully Applied for ${course.title}
+Please visit this link for further details about this course: ${course?.courseLink}
+
+Thank you for your trust in MedHr Plus.
+
+Best regards,
+
+MedHr Plus 🏅
+    `;
+
+  await sendEmail(user.email, "Successfully Applied for Course", emailMessage);
+
+  const emailMessageForEmployer = `
+You Have Received a New Application  for ${course.title}
+
+Thank you for your trust in MedHr Plus.
+
+Best regards,
+
+MedHr Plus 🏅
+    `;
+
+  const emailMessageForAdmin = `Dear Admin,
+
+We have received a new course application from **${user.full_name}** for the course titled **"${course.title}"**.
+
+Please log in to your dashboard to review the application details.
+
+Thank you for your continued support and dedication.
+
+Best regards,  
+**MedHr Plus** 🏅
+`;
+
+  await sendEmail(
+    employer,
+    "New Application Received",
+    emailMessageForEmployer
+  );
+  await sendEmail(
+    "medhrplus@gmail.com",
+    "New Application Received",
+    emailMessageForAdmin
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Successfully Applied",
   });
 });
