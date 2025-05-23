@@ -1,5 +1,5 @@
 const express = require("express");
-const { isAuthenticatedAdmin, isAuthenticatedEmployeer, isAuthenticatedAdminOrEmployer } = require("../middleware/auth");
+const { isAuthenticatedAdmin, isAuthenticatedEmployeer, isAuthenticatedAdminOrEmployer, isAuthenticatedUser } = require("../middleware/auth");
 const {
     createCourse,
     deleteCourse,
@@ -7,10 +7,12 @@ const {
     getCourseDetails,
     updateCourse,
     getAllEmployerCourses,
+    applyOnCourse,
 } = require("../controllers/courseController.js");
 const handleMultiMediaUpload = require("../middleware/mediaUpload.js");
 const router = express.Router();
 router.route("/courses/create").post(isAuthenticatedAdminOrEmployer, handleMultiMediaUpload, createCourse);
+router.route("/courses/apply/:id").post(isAuthenticatedUser, applyOnCourse);
 router
   .route("/employeer/course")
   .get(isAuthenticatedEmployeer, getAllEmployerCourses);

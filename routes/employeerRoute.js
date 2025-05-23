@@ -1,5 +1,5 @@
 const express = require("express");
-const { isAuthenticatedEmployeer } = require("../middleware/auth");
+const { isAuthenticatedEmployeer, isAuthenticatedAdminOrEmployer } = require("../middleware/auth");
 const singleUpload = require("../middleware/multer");
 const {
   registerEmployeer,
@@ -53,7 +53,7 @@ router
 router.route("/employeer/password/update").put(isAuthenticatedEmployeer, updatePassword);
 router
   .route("/employeer/employee/:id")
-  .get(isAuthenticatedEmployeer, getSingleEmployee)
+  .get(isAuthenticatedAdminOrEmployer, getSingleEmployee)
 
 
 module.exports = router;

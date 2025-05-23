@@ -8,32 +8,27 @@ const {
   bulkDeleteFiles,
 } = require("../utils/uploadFile.js");
 const getDataUri = require("../utils/dataUri.js");
-const Video = require("../models/videos.js");
+const sendEmail = require("../utils/sendEmail.js");
 
 // Create Skill with Videos
 exports.createSkills = catchAsyncErrors(async (req, res, next) => {
   const {
     skillProgrammeName,
     programmeOverview,
-    programmeDescription="",
+    programmeDescription = "",
     programmeType,
     department,
     duration,
-    desiredQualificationOrExperience="",
-    programmeLink="",
-    pricingType="Free",
+    desiredQualificationOrExperience = "",
+    programmeLink = "",
+    pricingType = "Free",
     fee,
     numberOfSeats,
-    isIncludedCertificate
+    isIncludedCertificate,
   } = req.body;
 
   // Validate required fields
-  if (
-    !skillProgrammeName ||
-    !programmeOverview ||
-    !department ||
-    !duration
-  ) {
+  if (!skillProgrammeName || !programmeOverview || !department || !duration) {
     return next(new ErrorHandler("Please fill all required fields", 400));
   }
 
@@ -82,7 +77,6 @@ exports.createSkills = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-
 // Update Skill
 exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
@@ -130,12 +124,14 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
   if (programmeType) skill.programmeType = programmeType;
   if (department) skill.department = department;
   if (duration) skill.duration = duration;
-  if (desiredQualificationOrExperience) skill.desiredQualificationOrExperience = desiredQualificationOrExperience;
+  if (desiredQualificationOrExperience)
+    skill.desiredQualificationOrExperience = desiredQualificationOrExperience;
   if (programmeLink) skill.programmeLink = programmeLink;
   if (pricingType) skill.pricingType = pricingType;
   if (typeof fee !== "undefined") skill.fee = fee;
   if (typeof numberOfSeats !== "undefined") skill.numberOfSeats = numberOfSeats;
-  if (typeof isIncludedCertificate !== "undefined") skill.isIncludedCertificate = isIncludedCertificate;
+  if (typeof isIncludedCertificate !== "undefined")
+    skill.isIncludedCertificate = isIncludedCertificate;
 
   // 🖼️ Thumbnail upload handling
   const thumbnailFile = req.files?.image?.[0];
@@ -165,7 +161,6 @@ exports.updateSkill = catchAsyncErrors(async (req, res, next) => {
     skill,
   });
 });
-
 
 // Other controller methods remain the same...
 exports.getAllSkills = catchAsyncErrors(async (req, res) => {
@@ -253,7 +248,8 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
 
   // 🔐 Authorization: allow if admin OR posting employer
   const isAdmin = req.admin;
-  const isOwner = req.user && skill.postedBy.toString() === req.user._id.toString();
+  const isOwner =
+    req.user && skill.postedBy.toString() === req.user._id.toString();
 
   if (!isAdmin && !isOwner) {
     return next(
@@ -282,5 +278,99 @@ exports.deleteSkill = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Skill deleted successfully",
+  });
+});
+
+// Apply on course
+exports.applyOnSkillProgram = catchAsyncErrors(async (req, res, next) => {
+  const skillProgram = await Skill.findById(req.params.id).populate(
+    "postedBy",
+    "name email"
+  );
+
+  const employer = skillProgram.postedBy.email;
+
+  const userId = req.user.id;
+  const user = req.user;
+
+  if (!skillProgram) {
+    return next(new ErrorHandler("Skill program not found", 404));
+  }
+
+  // Check if the user has already applied
+  if (
+    skillProgram.applicants.find(
+      (applicant) => applicant.employee.toString() === userId
+    )
+  ) {
+    return next(
+      new ErrorHandler("You have already applied for this program", 404)
+    );
+  }
+
+  // Add the user's ID to the applicants array
+  skillProgram.applicants.push({
+    employee: userId,
+  });
+
+  // Save the job document
+  await skillProgram.save();
+
+  const emailMessage = `Dear ${user?.full_name},
+
+Thank you for choosing MedHr Plus! 🏆
+
+You Have Successfully Applied for ${skillProgram.skillProgrammeName}
+Please visit this link for further details about this Skill Program: ${skillProgram?.programmeLink}
+
+Thank you for your trust in MedHr Plus.
+
+Best regards,
+
+MedHr Plus 🏅
+    `;
+
+  await sendEmail(
+    user.email,
+    "Successfully Applied for Skill program",
+    emailMessage
+  );
+
+  const emailMessageForEmployer = `
+You Have Received a New Application  for ${skillProgram.skillProgrammeName}
+
+Thank you for your trust in MedHr Plus.
+
+Best regards,
+
+MedHr Plus 🏅
+    `;
+
+  const emailMessageForAdmin = `Dear Admin,
+
+We have received a new Skill Program application from **${user.full_name}** for the Skill Program titled **"${skillProgram.skillProgrammeName}"**.
+
+Please log in to your dashboard to review the application details.
+
+Thank you for your continued support and dedication.
+
+Best regards,  
+**MedHr Plus** 🏅
+`;
+
+  await sendEmail(
+    employer,
+    "New Application Received",
+    emailMessageForEmployer
+  );
+  await sendEmail(
+    "medhrplus@gmail.com",
+    "New Application Received",
+    emailMessageForAdmin
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Successfully Applied",
   });
 });

@@ -1,6 +1,17 @@
 const mongoose = require("mongoose");
 const { FileSchema } = require("./file.js");
 
+const ApplicantSchema = new mongoose.Schema({
+  employee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
+  },
+  appliedDate: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const courseSchema = new mongoose.Schema(
   {
     courseName: {
@@ -50,6 +61,7 @@ const courseSchema = new mongoose.Schema(
       default: false,
     },
     thumbnail: FileSchema,
+    applicants: [ApplicantSchema], // Array of applicant IDs
     postedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employeer",
