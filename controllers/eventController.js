@@ -3,6 +3,7 @@ const getDataUri = require("../utils/dataUri");
 const ErrorHandler = require("../utils/errorhandler");
 const { uploadFile, deleteFile } = require("../utils/uploadFile");
 const catchAsyncErrors = require("../middleware/catchAsyncError");
+const ApiFeatures = require("../utils/apifeatures.js");
 
 // Get all events
 exports.createEvent = catchAsyncErrors(async (req, res, next) => {
@@ -57,7 +58,7 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
 
 // Get all events for admin
 exports.getAllEvents = catchAsyncErrors(async (req, res, next) => {
-  const events = await Event.find().populate("createdBy", "full_name email");
+  const events = await Event.find().populate("postedBy", "full_name email");
   res.status(200).json({
     success: true,
     data: events,
@@ -67,7 +68,7 @@ exports.getAllEvents = catchAsyncErrors(async (req, res, next) => {
 // Get all courses for employer
 exports.getAllEmployerEvents = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
-  const courseCount = await Event.countDocuments({ postedBy: req.user.id });
+  const eventsCount = await Event.countDocuments({ postedBy: req.user.id });
 
   const apiFeature = new ApiFeatures(
     Event.find({ postedBy: req.user.id }),
@@ -80,7 +81,7 @@ exports.getAllEmployerEvents = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    courseCount,
+    eventsCount,
     events,
     resultPerPage,
     filteredJobsCount: events.length,
@@ -92,7 +93,7 @@ exports.getEventById = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
 
   const event = await Event.findById(id).populate(
-    "createdBy",
+    "postedBy",
     "full_name email"
   );
 
