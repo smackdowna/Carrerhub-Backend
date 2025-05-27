@@ -49,7 +49,6 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
 //for employeer
 exports.isAuthenticatedEmployeer = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.user);
   const token = req.cookies;
 
   if (!token[EMPLOYER_AUTH_TOKEN]) {
@@ -113,7 +112,6 @@ exports.isAuthenticatedAdminOrEmployer = catchAsyncErrors(async (req, res, next)
 
   const adminToken = token[ADMIN_AUTH_TOKEN];
   const employerToken = token[EMPLOYER_AUTH_TOKEN];
-  console.log(employerToken);
 
   let decodedData;
 

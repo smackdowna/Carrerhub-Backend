@@ -161,7 +161,6 @@ exports.deleteCourse = catchAsyncErrors(async (req, res, next) => {
     try {
       await bulkDeleteFiles(fileIdsToDelete);
     } catch (error) {
-      console.log(error);
       return next(new ErrorHandler("Failed to delete files", 500));
     }
   }
@@ -291,8 +290,6 @@ exports.applyOnCourse = catchAsyncErrors(async (req, res, next) => {
     "postedBy",
     "name email"
   );
-
-  console.log(course);
 
   const employer = course.postedBy.email;
 

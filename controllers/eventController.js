@@ -7,7 +7,7 @@ const ApiFeatures = require("../utils/apifeatures.js");
 
 // Get all events
 exports.createEvent = catchAsyncErrors(async (req, res, next) => {
-  const { date, time, eventName, eventUrl, company, skillCovered } = req.body;
+  const { date, time, eventName, eventUrl, company, skillCovered, organizerName, organizationType, department } = req.body;
 
   if (!date || !time || !eventName || !eventUrl || !company || !skillCovered) {
     return next(new ErrorHandler("Please Enter All Fields", 400));
@@ -31,6 +31,9 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
       time,
       eventName,
       eventUrl,
+      organizerName,
+      organizationType,
+      department,
       company: JSON.parse(company),
       skillCovered: JSON.parse(skillCovered),
       image: {
@@ -110,7 +113,7 @@ exports.getEventById = catchAsyncErrors(async (req, res, next) => {
 // Update event by id
 exports.updateEvent = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
-  let { eventName, eventUrl, date, time, company, skillCovered } = req.body;
+  let { eventName, eventUrl, date, time, company, skillCovered, organizerName, organizationType, department } = req.body;
 
   const event = await Event.findById(id);
 
@@ -134,6 +137,9 @@ exports.updateEvent = catchAsyncErrors(async (req, res, next) => {
   if (eventUrl) event.eventUrl = eventUrl;
   if (date) event.date = date;
   if (time) event.time = time;
+  if (organizerName) event.organizerName = organizerName;
+  if (organizationType) event.organizationType = organizationType;
+  if (department) event.department = department;
 
   // Parse and update company
   if (company) {

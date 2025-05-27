@@ -48,7 +48,6 @@ exports.registerEmployeer = catchAsyncErrors(async (req, res, next) => {
   }
 
   const otp = Math.floor(Math.random() * 100000);
-  console.log("This is The registration OTP", otp);
 
   user = await Employeer.create({
     full_name,
@@ -150,8 +149,6 @@ Welcome to a new chapter of your career journey 🚀
 Best regards,  
 MedHR Plus Team
 `;
-
-  console.log(emailMessage);
 
   await sendEmail(
     user?.email,
@@ -404,7 +401,6 @@ exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
         fileUri.fileName,
         "company_avatar"
       );
-      console.log(result);
       if (user.company_avatar.public_id && user.company_avatar.url) {
         await deleteFile(user.company_avatar.public_id);
       }

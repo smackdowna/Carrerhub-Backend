@@ -52,7 +52,6 @@ exports.getVideo = catchAsyncErrors(async (req, res, next) => {
 
 exports.updateVideo = catchAsyncErrors(async (req, res, next) => {
   const video = await Video.findById(req.params.id);
-  console.log(video);
 
   if (!video) {
     return next(new ErrorHandler("Video not found", 404));
