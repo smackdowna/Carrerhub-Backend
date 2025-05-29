@@ -48,7 +48,11 @@ const jobSchema = new mongoose.Schema({
     enum: ["Remote", "Onsite", "Hybrid"],
     required: true,
   },
-  location: {
+  country: {
+    type: String,
+    required: true,
+  },
+  city: {
     type: String,
     required: true,
   },
@@ -74,11 +78,11 @@ const jobSchema = new mongoose.Schema({
     },
   },
 
-  department: {
+  typeOfOrganization: {
     type: String,
     required: true,
   },
-  subDepartment: {
+  department: {
     type: String,
     required: true,
   },

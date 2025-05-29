@@ -48,7 +48,6 @@ exports.registerEmployeer = catchAsyncErrors(async (req, res, next) => {
   }
 
   const otp = Math.floor(Math.random() * 100000);
-  console.log("This is The registration OTP", otp);
 
   user = await Employeer.create({
     full_name,
@@ -150,8 +149,6 @@ Welcome to a new chapter of your career journey 🚀
 Best regards,  
 MedHR Plus Team
 `;
-
-  console.log(emailMessage);
 
   await sendEmail(
     user?.email,
@@ -404,7 +401,6 @@ exports.updateEmployeerDetails = catchAsyncErrors(async (req, res, next) => {
         fileUri.fileName,
         "company_avatar"
       );
-      console.log(result);
       if (user.company_avatar.public_id && user.company_avatar.url) {
         await deleteFile(user.company_avatar.public_id);
       }
@@ -466,6 +462,7 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
     language,
     experience,
     designation,
+    areaOfInterest,
     keyword,
     currentlyLookingFor,
     courseName,
@@ -475,12 +472,13 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
   let query = {};
 
   if (gender) query.gender = gender;
+  if (designation) query.designation = designation;
   if (country) query["address.country"] = country;
   if (city) query["address.city"] = city;
-  if (designation) {
-    const designationArray = Array.isArray(designation)
-      ? designation.split(",")
-      : [designation];
+  if (areaOfInterest) {
+    const designationArray = Array.isArray(areaOfInterest)
+      ? areaOfInterest.split(",")
+      : [areaOfInterest];
     query.areasOfInterests = {
       $elemMatch: { $regex: designationArray.join("|"), $options: "i" },
     };

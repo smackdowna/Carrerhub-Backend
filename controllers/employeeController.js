@@ -46,7 +46,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   }
 
   const otp = Math.floor(Math.random() * 100000);
-  console.log("This is The registration OTP", otp);
 
   user = await Emp.create({
     full_name,
@@ -320,6 +319,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
   const {
     dob,
+    designation,
     gender,
     guardian,
     preferredLanguages,
@@ -343,6 +343,7 @@ exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
 
   // Dynamically add fields to updateFields if they are provided in the request
   if (dob) updateFields.dob = dob;
+  if (designation) updateFields.designation = designation;
   if (gender) updateFields.gender = gender;
   if (guardian) updateFields.guardian = guardian;
   if (preferredLanguages) updateFields.preferredLanguages = preferredLanguages;
@@ -402,7 +403,6 @@ exports.updateUserDetails = catchAsyncErrors(async (req, res, next) => {
 
   if (file) {
     const fileUri = getDataUri(file);
-    console.log(fileUri.fileName);
     // const mycloud = await cloudinary.v2.uploader.upload(fileUri.content, {
     //   folder: "avatars",
     //   width: 150,
@@ -468,10 +468,8 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 
 //upload/replace resume
 exports.uploadUserResume = catchAsyncErrors(async (req, res, next) => {
-  const file = req.file; // Assuming you are using multer or similar middleware for file uploads
-  console.log(req.user._id);
+  const file = req.file;
   const user = await Emp.findById(req.user._id);
-  console.log(user);
 
   if (!user.resumes) {
     user.resumes = {};

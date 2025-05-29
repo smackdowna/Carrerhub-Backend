@@ -163,8 +163,6 @@ exports.counts = catchAsyncErrors(async (req, res, next) => {
   totalJobs.forEach(job => {
     hiredApplicantsCount += job.applicants.filter(applicant => applicant.status === "HIRED").length;
   });
-
-  console.log(totalJobs);
   res.status(200).json({
     success: true,
     jobsCount: totalJobs.length,
