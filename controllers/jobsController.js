@@ -20,7 +20,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     employmentTypeCategory,
     employmentDuration,
     department,
-    subDepartment,
+    typeOfOrganization,
     salary,
     applicationDeadline,
     extraBenefits,
@@ -43,7 +43,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     !employmentTypeCategory ||
     !employmentDuration ||
     !department ||
-    !subDepartment ||
+    !typeOfOrganization ||
     !salary ||
     !applicationDeadline ||
     !extraBenefits ||
@@ -76,7 +76,7 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     },
     employmentDuration,
     department,
-    subDepartment,
+    typeOfOrganization,
     salary,
     postedBy: userId,
     applicationDeadline,

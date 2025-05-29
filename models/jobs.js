@@ -78,11 +78,11 @@ const jobSchema = new mongoose.Schema({
     },
   },
 
-  department: {
+  typeOfOrganization: {
     type: String,
     required: true,
   },
-  subDepartment: {
+  department: {
     type: String,
     required: true,
   },
