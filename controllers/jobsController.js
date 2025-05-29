@@ -25,7 +25,8 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     applicationDeadline,
     extraBenefits,
     experience,
-    location,
+    country,
+    city,
   } = req.body;
 
   const userId = req.user.id;
@@ -47,7 +48,8 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     !applicationDeadline ||
     !extraBenefits ||
     !experience ||
-    !location
+    !country ||
+    !city
   ) {
     return next(new ErrorHandler("Please Enter All Fields", 400));
   }
@@ -80,7 +82,8 @@ exports.createJob = catchAsyncErrors(async (req, res, next) => {
     applicationDeadline,
     extraBenefits,
     experience,
-    location,
+    country,
+    city,
   });
 
   res.status(201).json({

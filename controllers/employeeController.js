@@ -319,6 +319,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
   const {
     dob,
+    designation,
     gender,
     guardian,
     preferredLanguages,
@@ -342,6 +343,7 @@ exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
 
   // Dynamically add fields to updateFields if they are provided in the request
   if (dob) updateFields.dob = dob;
+  if (designation) updateFields.designation = designation;
   if (gender) updateFields.gender = gender;
   if (guardian) updateFields.guardian = guardian;
   if (preferredLanguages) updateFields.preferredLanguages = preferredLanguages;

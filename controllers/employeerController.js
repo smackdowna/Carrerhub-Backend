@@ -462,6 +462,7 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
     language,
     experience,
     designation,
+    areaOfInterest,
     keyword,
     currentlyLookingFor,
     courseName,
@@ -471,12 +472,13 @@ exports.findCandidates = catchAsyncErrors(async (req, res, next) => {
   let query = {};
 
   if (gender) query.gender = gender;
+  if (designation) query.designation = designation;
   if (country) query["address.country"] = country;
   if (city) query["address.city"] = city;
-  if (designation) {
-    const designationArray = Array.isArray(designation)
-      ? designation.split(",")
-      : [designation];
+  if (areaOfInterest) {
+    const designationArray = Array.isArray(areaOfInterest)
+      ? areaOfInterest.split(",")
+      : [areaOfInterest];
     query.areasOfInterests = {
       $elemMatch: { $regex: designationArray.join("|"), $options: "i" },
     };

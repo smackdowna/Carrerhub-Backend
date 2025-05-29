@@ -30,6 +30,9 @@ const empSchema = new mongoose.Schema({
   dob: {
     type: String,
   },
+  designation: {
+    type: String,
+  },
   // Newly added by Rahul (Start)
   gender: {
     type: String,
