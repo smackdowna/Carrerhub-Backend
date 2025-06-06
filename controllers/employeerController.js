@@ -120,7 +120,6 @@ MedHR Plus 🏅
 
   await sendEmail(user.email, "Welcome To MedHR Plus", emailMessage);
 
-  // Generate token
   const token = user.getJWTToken();
 
   res.status(200).json({
