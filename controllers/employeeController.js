@@ -118,7 +118,24 @@ MedHR+ 🏅
 
   await sendEmail(user.email, "Welcome To MedHR+", emailMessage);
 
-  sendToken(user, 200, res, "Account Verified", EMPLOYEE_AUTH_TOKEN);
+  // Generate token manually
+  const token = user.getJWTToken();
+
+  // Construct user data
+  const userData = {
+    _id: user._id,
+    full_name: user.full_name,
+    email: user.email,
+    phoneNo: user.phoneNo,
+    verified: user.verified,
+  };
+
+  res.status(200).json({
+    success: true,
+    message: "Account verified. You can now log in.",
+    user: userData,
+    accessToken: token,
+  });
 });
 
 //login user
@@ -164,7 +181,6 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     accessToken: token,
   });
 });
-
 
 // Logout User
 exports.logout = catchAsyncErrors(async (req, res, next) => {
@@ -368,7 +384,8 @@ exports.EnterUserDetails = catchAsyncErrors(async (req, res, next) => {
   if (guardian) updateFields.guardian = guardian;
   if (preferredLanguages) updateFields.preferredLanguages = preferredLanguages;
   if (areasOfInterests) updateFields.areasOfInterests = areasOfInterests;
-  if (currentlyLookingFor) updateFields.currentlyLookingFor = currentlyLookingFor;
+  if (currentlyLookingFor)
+    updateFields.currentlyLookingFor = currentlyLookingFor;
   if (address) updateFields.address = address;
   if (education) updateFields.education = education;
   if (experience) updateFields.experience = experience;
