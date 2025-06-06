@@ -120,7 +120,21 @@ MedHR Plus 🏅
 
   await sendEmail(user.email, "Welcome To MedHR Plus", emailMessage);
 
-  sendToken(user, 200, res, "Account Verified", EMPLOYER_AUTH_TOKEN);
+  // Generate token
+  const token = user.getJWTToken();
+
+  res.status(200).json({
+    success: true,
+    message: "Account verified. You can now login",
+    user: {
+      _id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      phoneNo: user.phoneNo,
+      verified: user.verified,
+    },
+    accessToken: token,
+  });
 });
 
 //send email to employee
