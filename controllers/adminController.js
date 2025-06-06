@@ -35,22 +35,37 @@ exports.registerAdmin = catchAsyncErrors(async (req, res, next) => {
 
 exports.loginAdmin = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
+
   if (!email || !password) {
     return next(new ErrorHandler("Please enter email and password", 400));
   }
+
   const admin = await Admin.findOne({ email }).select("+password");
   if (!admin) {
     return next(new ErrorHandler("Invalid Email or Password", 401));
   }
 
   const isPasswordMatched = await admin.comparePassword(password);
-
   if (!isPasswordMatched) {
     return next(new ErrorHandler("Invalid Email or Password", 401));
   }
 
-  sendToken(admin, 200, res, "Admin Logged in Successfully", ADMIN_AUTH_TOKEN);
+  const token = admin.getJWTToken();
+
+  res.status(200).json({
+    success: true,
+    message: "Admin Logged in Successfully",
+    user: {
+      _id: admin.id,
+      full_name: admin.full_name,
+      email: admin.email,
+      phoneNo: admin.phoneNo,
+      verified: admin.verified,
+    },
+    accessToken: token,
+  });
 });
+
 
 exports.logoutAdmin = catchAsyncErrors(async (req, res, next) => {
   res.cookie(ADMIN_AUTH_TOKEN, "", {

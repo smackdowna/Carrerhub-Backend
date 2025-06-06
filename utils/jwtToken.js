@@ -25,6 +25,7 @@ const sendToken = (user, statusCode, res, message, tokenKey) => {
     success: true,
     message,
     user: userData,
+    accessToken: token,
   });
 };
 

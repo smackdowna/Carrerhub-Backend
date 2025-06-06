@@ -166,8 +166,6 @@ MedHR Plus Team
 exports.loginEmployeer = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // checking if user has given password and email both
-
   if (!email || !password) {
     return next(new ErrorHandler("Please Enter Email & Password", 400));
   }
@@ -184,8 +182,24 @@ exports.loginEmployeer = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
-  sendToken(user, 200, res, "Logged in Successfully!", EMPLOYER_AUTH_TOKEN);
+  // Generate token
+  const token = user.getJWTToken();
+
+  // Send response without setting cookies
+  res.status(200).json({
+    success: true,
+    message: "Logged in Successfully!",
+    user: {
+      _id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      phoneNo: user.phoneNo,
+      verified: user.verified,
+    },
+    accessToken: token,
+  });
 });
+
 
 // Logout User
 exports.logout = catchAsyncErrors(async (req, res, next) => {

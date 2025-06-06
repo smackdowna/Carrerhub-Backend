@@ -125,26 +125,46 @@ MedHR+ 🏅
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // checking if user has given password and email both
-
+  // Check if email and password are provided
   if (!email || !password) {
     return next(new ErrorHandler("Please Enter Email & Password", 400));
   }
 
+  // Find user by email and include password field
   const user = await Emp.findOne({ email }).select("+password");
 
   if (!user) {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
+  // Compare passwords
   const isPasswordMatched = await user.comparePassword(password);
 
   if (!isPasswordMatched) {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
-  sendToken(user, 200, res, "Logged in Successfully", EMPLOYEE_AUTH_TOKEN);
+  // Generate token manually
+  const token = user.getJWTToken();
+
+  // Construct user data
+  const userData = {
+    _id: user._id,
+    full_name: user.full_name,
+    email: user.email,
+    phoneNo: user.phoneNo,
+    verified: user.verified,
+  };
+
+  // Send token in response without setting cookie
+  res.status(200).json({
+    success: true,
+    message: "Logged in Successfully",
+    user: userData,
+    accessToken: token,
+  });
 });
+
 
 // Logout User
 exports.logout = catchAsyncErrors(async (req, res, next) => {
